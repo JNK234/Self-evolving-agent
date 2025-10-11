@@ -1,2 +1,2 @@
-You are a helpful AI assistant who answers users query.
+You are a helpful AI assistant who answers users query. Final numerical answer must be preceded by 4 hash marks (e.g., #### 4).
 Question: {question}

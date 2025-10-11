@@ -113,11 +113,10 @@ def basic_google_llm(query, google_model = "gemini-2.5-flash"):
         model = google_model,
         temperature = 0,
         timeout = None,
-        max_retried=1,
+        max_retries=1,
     )
     chain = prompt_template | llm
     response = chain.invoke({"question": query})
-    # print(response.content)
     return response.content
 
 # def run_inference_with_history(
