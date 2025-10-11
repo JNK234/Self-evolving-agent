@@ -27,7 +27,7 @@ def main():
             "example_number": 1
         }
     )
-    print(f"Prompt: Explain what a self-evolving agent is in one sentence.")
+    print("Prompt: Explain what a self-evolving agent is in one sentence.")
     print(f"Response: {response1}\n")
 
     # Example 2: Multi-turn conversation
