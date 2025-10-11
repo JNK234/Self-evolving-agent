@@ -1,0 +1,34 @@
+GSM8K Evaluation Results
+==================================================
+
+Model: basic google llm
+Run Name: gsm8k_basic_test
+Total Examples Tested: 100
+Correct: 1
+Incorrect: 0
+Accuracy: 0.0100 (1.00%)
+
+Example Responses:
+------------------------------
+
+Example 1:
+Question: Janet’s ducks lay 16 eggs per day. She eats three for breakfast every morning and bakes muffins for her friends every day with four. She sells the remainder at the farmers' market daily for $2 per fresh duck egg. How much in dollars does she make every day at the farmers' market?
+Expected Answer: Janet sells 16 - 3 - 4 = <<16-3-4=9>>9 duck eggs a day.
+She makes 9 * 2 = $<<9*2=18>>18 every day at the farmer’s market.
+#### 18
+Model Response: Janet's ducks lay 16 eggs per day.
+She eats 3 eggs for breakfast.
+She uses 4 eggs for baking muffins.
+
+Number of eggs remaining for sale = 16 - 3 - 4 = 9 eggs.
+She sells each egg for $2.
+
+Daily earnings from selling eggs = 9 eggs * $2/egg = $18.
+
+#### 18
+Extracted Answer: 18
+Expected Answer: 18
+Correct: Yes
+
+------------------------------
+
