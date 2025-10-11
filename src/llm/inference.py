@@ -5,6 +5,7 @@ import os
 from typing import Optional, Dict, Any
 from dotenv import load_dotenv
 import weave
+from langchain_core.prompts import PromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, AIMessage
 
@@ -100,49 +101,67 @@ def run_inference(
         return response.content
     return str(response)
 
+def basic_google_llm(query, google_model = "gemini-2.5-flash"):
+    basic_prompt_file = "prompt_templates/basic_p.txt"
+    with open(basic_prompt_file, 'r') as file:
+        BASIC_PROMPT = file.read()
+    
+    prompt_template = PromptTemplate.from_template(BASIC_PROMPT)
+    # prompt_template.invoke({"question": query})
 
-def run_inference_with_history(
-    messages: list,
-    model: Optional[str] = None,
-    temperature: float = 0.7,
-    metadata: Optional[Dict[str, Any]] = None,
-    **kwargs
-) -> str:
-    """
-    Run LLM inference with conversation history for multi-turn dialogues.
+    llm = ChatGoogleGenerativeAI(
+        model = google_model,
+        temperature = 0,
+        timeout = None,
+        max_retried=1,
+    )
+    chain = prompt_template | llm
+    response = chain.invoke({"question": query})
+    # print(response.content)
+    return response.content
 
-    Args:
-        messages: List of message dicts with 'role' and 'content' keys
-                 Example: [
-                     {"role": "user", "content": "Hello"},
-                     {"role": "assistant", "content": "Hi there!"},
-                     {"role": "user", "content": "How are you?"}
-                 ]
-        model: Optional Gemini model override
-        temperature: Sampling temperature (0.0-1.0)
-        metadata: Optional custom metadata for tracing
-        **kwargs: Additional LLM parameters
+# def run_inference_with_history(
+#     messages: list,
+#     model: Optional[str] = None,
+#     temperature: float = 0.7,
+#     metadata: Optional[Dict[str, Any]] = None,
+#     **kwargs
+# ) -> str:
+#     """
+#     Run LLM inference with conversation history for multi-turn dialogues.
 
-    Returns:
-        The LLM's response as a string
-    """
-    llm = get_llm_client(model=model, temperature=temperature, **kwargs)
+#     Args:
+#         messages: List of message dicts with 'role' and 'content' keys
+#                  Example: [
+#                      {"role": "user", "content": "Hello"},
+#                      {"role": "assistant", "content": "Hi there!"},
+#                      {"role": "user", "content": "How are you?"}
+#                  ]
+#         model: Optional Gemini model override
+#         temperature: Sampling temperature (0.0-1.0)
+#         metadata: Optional custom metadata for tracing
+#         **kwargs: Additional LLM parameters
 
-    # Convert message dicts to LangChain message objects
-    langchain_messages = []
-    for msg in messages:
-        if msg["role"] == "user":
-            langchain_messages.append(HumanMessage(content=msg["content"]))
-        elif msg["role"] == "assistant":
-            langchain_messages.append(AIMessage(content=msg["content"]))
+#     Returns:
+#         The LLM's response as a string
+#     """
+#     llm = get_llm_client(model=model, temperature=temperature, **kwargs)
 
-    # Execute with optional metadata
-    if metadata:
-        with weave.attributes(metadata):
-            response = llm.invoke(langchain_messages)
-    else:
-        response = llm.invoke(langchain_messages)
+#     # Convert message dicts to LangChain message objects
+#     langchain_messages = []
+#     for msg in messages:
+#         if msg["role"] == "user":
+#             langchain_messages.append(HumanMessage(content=msg["content"]))
+#         elif msg["role"] == "assistant":
+#             langchain_messages.append(AIMessage(content=msg["content"]))
 
-    if isinstance(response, AIMessage):
-        return response.content
-    return str(response)
+#     # Execute with optional metadata
+#     if metadata:
+#         with weave.attributes(metadata):
+#             response = llm.invoke(langchain_messages)
+#     else:
+#         response = llm.invoke(langchain_messages)
+
+#     if isinstance(response, AIMessage):
+#         return response.content
+#     return str(response)

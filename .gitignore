@@ -1,2 +1,6 @@
 .env 
 .claude
+*.pyc
+
+*/__pycache__/
+*/self_evolving_agent.egg-info
