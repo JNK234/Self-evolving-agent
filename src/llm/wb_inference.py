@@ -189,6 +189,15 @@ class WBInference:
         return response.choices[0].message.content
 
 
+def basic_wb_llm(query: str) -> str:
+    """Simple W&B inference with prompt template for GSM8K evaluation."""
+    with open("prompt_templates/basic_p.txt", 'r') as f:
+        prompt = f.read().format(question=query)
+
+    wb_llm = WBInference(temperature=0)
+    return wb_llm.run_inference(prompt=prompt)
+
+
 # Convenience function for quick usage
 @weave.op()
 def run_wb_inference(

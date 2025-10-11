@@ -1,6 +1,7 @@
-import re
+import re, os
 from datasets import load_dataset
 from src.llm.inference import run_inference, basic_google_llm
+from src.llm.wb_inference import basic_wb_llm
 from src.utils.save_evals import extract_answer, save_eval_results
 
 def eval_gsm8k(llm : str, run_name = None):
@@ -16,14 +17,15 @@ def eval_gsm8k(llm : str, run_name = None):
     dataset = ds['test'][:total]
 
     for query, answer in zip(dataset['question'], dataset['answer']):
-        if llm == "basic google llm":
-            prediction = basic_google_llm(query)
-            responses.append({"question": query, "answer": answer, "llm_response": prediction})
+        prediction = basic_wb_llm(query)  # W&B Inference
+        # prediction = basic_google_llm(query)  # Gemini (commented for now)
 
-            if extract_answer(prediction) == extract_answer(answer):
-                correct += 1
-            else:
-                incorrect += 1
+        responses.append({"question": query, "answer": answer, "llm_response": prediction})
+
+        if extract_answer(prediction) == extract_answer(answer):
+            correct += 1
+        else:
+            incorrect += 1
         break # remove the break when want to run on full dataset (: total).
     accuracy = correct / total
     # print(f"Accuracy: {accuracy:.2f}")
@@ -32,10 +34,10 @@ def eval_gsm8k(llm : str, run_name = None):
 
 
 def main():
-    llm = "basic google llm"
-    run_name = "gsm8k_basic_test"
-    
-    responses = eval_gsm8k(llm, run_name)
+    llm = os.getenv("WB_INFERENCE_MODEL")
+    # run_name = "GSM_8K_LLM"
+
+    responses = eval_gsm8k(llm)
     print(f"Evaluation completed. {len(responses)} responses generated.")
 
 if __name__ == "__main__":

@@ -1,8 +1,6 @@
 import re
 import os
 from datetime import datetime
-from datasets import load_dataset
-from src.llm.inference import run_inference, basic_google_llm
 
 def extract_answer(text):
     match = re.search(r'####\s*([0-9\.]+)', text)
@@ -18,7 +16,7 @@ def save_eval_results(model_name, total, correct, incorrect, accuracy, responses
         run_name = f"run_{timestamp}"
     
     # Create filename
-    filename = f"eval_results/{run_name}_{model_name.replace(' ', '_')}.txt"
+    filename = f"eval_results/{run_name}_{model_name.replace('/', '_')}.txt"
     
     # Write results to file
     with open(filename, 'w') as f:
