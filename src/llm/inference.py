@@ -1,10 +1,12 @@
 
 import os
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from dotenv import load_dotenv
+import weave
 from langchain_core.prompts import PromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
+from langgraph.prebuilt import create_react_agent
 
 load_dotenv()
 
@@ -97,66 +99,99 @@ def run_inference(
         return response.content
     return str(response)
 
-def basic_google_llm(query, google_model = "gemini-2.5-flash"):
-    basic_prompt_file = "prompt_templates/basic_p.txt"
-    with open(basic_prompt_file, 'r') as file:
-        BASIC_PROMPT = file.read()
-    
-    prompt_template = PromptTemplate.from_template(BASIC_PROMPT)
-    # prompt_template.invoke({"question": query})
 
-    llm = ChatGoogleGenerativeAI(
-        model = google_model,
-        temperature = 0,
-        timeout = None,
-        max_retries=1,
-    )
-    chain = prompt_template | llm
-    response = chain.invoke({"question": query})
-    return response.content
+@weave.op()
+def run_react_agent(
+    question: str,
+    tools: List,
+    model: Optional[str] = None,
+    temperature: float = 0,
+    system_message: Optional[str] = None,
+    prompt_template_file: Optional[str] = None,
+    metadata: Optional[Dict[str, Any]] = None,
+    **kwargs
+) -> str:
+    """
+    Run a ReAct agent with tool access and automatic Weave tracing.
 
-# def run_inference_with_history(
-#     messages: list,
-#     model: Optional[str] = None,
-#     temperature: float = 0.7,
-#     metadata: Optional[Dict[str, Any]] = None,
-#     **kwargs
-# ) -> str:
-#     """
-#     Run LLM inference with conversation history for multi-turn dialogues.
+    This function creates and invokes a LangGraph ReAct agent that can use tools
+    to solve problems. It supports flexible prompt configuration and integrates
+    with Weave for full observability.
 
-#     Args:
-#         messages: List of message dicts with 'role' and 'content' keys
-#                  Example: [
-#                      {"role": "user", "content": "Hello"},
-#                      {"role": "assistant", "content": "Hi there!"},
-#                      {"role": "user", "content": "How are you?"}
-#                  ]
-#         model: Optional Gemini model override
-#         temperature: Sampling temperature (0.0-1.0)
-#         metadata: Optional custom metadata for tracing
-#         **kwargs: Additional LLM parameters
+    Args:
+        question: The user's question or problem to solve
+        tools: List of LangChain tools the agent can use (e.g., calculator, search)
+        model: Optional Gemini model override (default from env)
+        temperature: Sampling temperature (0.0-1.0), default 0 for deterministic math
+        system_message: Optional system prompt string to guide agent behavior
+        prompt_template_file: Optional path to prompt template file (overrides system_message)
+        metadata: Optional dict of custom metadata to attach to Weave trace
+        **kwargs: Additional parameters for the LLM client
 
-#     Returns:
-#         The LLM's response as a string
-#     """
-#     llm = get_llm_client(model=model, temperature=temperature, **kwargs)
+    Returns:
+        The agent's final answer as a string
 
-#     # Convert message dicts to LangChain message objects
-#     langchain_messages = []
-#     for msg in messages:
-#         if msg["role"] == "user":
-#             langchain_messages.append(HumanMessage(content=msg["content"]))
-#         elif msg["role"] == "assistant":
-#             langchain_messages.append(AIMessage(content=msg["content"]))
+    Example:
+        >>> from src.agents.tools.langchain_calculator import calculator_tool
+        >>> answer = run_react_agent(
+        ...     question="What is 25 * 4 + 10?",
+        ...     tools=[calculator_tool],
+        ...     prompt_template_file="prompt_templates/math_tools.txt",
+        ...     temperature=0
+        ... )
 
-#     # Execute with optional metadata
-#     if metadata:
-#         with weave.attributes(metadata):
-#             response = llm.invoke(langchain_messages)
-#     else:
-#         response = llm.invoke(langchain_messages)
+    Note:
+        - The function automatically traces all agent interactions through Weave
+        - Tool usage and intermediate reasoning steps are captured
+        - The prompt template serves as system instructions; user question is passed separately
+    """
+    # Get LLM client
+    llm = get_llm_client(model=model, temperature=temperature, **kwargs)
 
-#     if isinstance(response, AIMessage):
-#         return response.content
-#     return str(response)
+    # Load prompt template from file or use provided system message
+    if prompt_template_file:
+        with open(prompt_template_file, 'r') as f:
+            system_prompt = f.read()
+    elif system_message:
+        system_prompt = system_message
+    else:
+        # Default minimal system prompt
+        system_prompt = "You are a helpful AI assistant. Use the available tools to solve problems."
+
+    # Create messages list with system message and user question
+    # ReAct agents need both: system instructions + user query
+    messages = [
+        SystemMessage(content=system_prompt),
+        HumanMessage(content=question)
+    ]
+
+    # Create ReAct agent with increased recursion limit for complex problems
+    agent = create_react_agent(llm, tools)
+
+    # Invoke agent with optional metadata tracing and recursion limit
+    invoke_config = {"recursion_limit": 50}
+
+    if metadata:
+        with weave.attributes(metadata):
+            result = agent.invoke({"messages": messages}, config=invoke_config)
+    else:
+        result = agent.invoke({"messages": messages}, config=invoke_config)
+
+    # Extract final answer from agent result
+    # The result contains a list of messages, get the last one
+    if "messages" in result and len(result["messages"]) > 0:
+        final_answer = result["messages"][-1].content
+        # If content is empty, return full result for debugging
+        if not final_answer or final_answer.strip() == "":
+            print(f"WARNING: Empty response from agent. Full result: {result}")
+            # Try to find the last non-empty AI message
+            for msg in reversed(result["messages"]):
+                if hasattr(msg, 'content') and msg.content and msg.content.strip():
+                    final_answer = msg.content
+                    break
+    else:
+        final_answer = str(result)
+
+    return final_answer
+
+

@@ -5,8 +5,6 @@ from agent.google_agent import google_agent
 from agent.phi_agent import phi_agent
 from llm.google_llm import basic_google_llm
 from llm.phi_llm import phi_llm
-# from src.llm.inference import run_inference, basic_google_llm
-# from src.llm.wb_inference import basic_wb_llm
 from utils.evals_utils import extract_answer, save_eval_results
 from utils.evals_utils import evaluate_with_llm, log_to_wandb
 
