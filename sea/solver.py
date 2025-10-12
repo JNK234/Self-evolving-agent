@@ -11,11 +11,11 @@ load_dotenv()
 
 def solver(query: str, custom_prompt: str = None):
     tools = [add, subtract, multiply, divide, power, sqrt]
-    
+
     if custom_prompt:
         system_prompt = custom_prompt
     else:
-        with open("prompt_templates/sea_solver_p.txt", "r") as f:
+        with open("prompt_templates/agents/math_solver/solver.txt", "r") as f:
             system_prompt = f.read()
 
     # llm = ChatGoogleGenerativeAI(

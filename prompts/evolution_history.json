@@ -1,0 +1,35 @@
+[
+  {
+    "cycle": 1,
+    "avg_score": 0.59,
+    "criterion_scores": {
+      "clarity_of_reasoning": 0.62,
+      "correct_tool_usage": 0.05,
+      "final_answer_format": 0.95
+    },
+    "updated": true,
+    "version": 1
+  },
+  {
+    "cycle": 2,
+    "avg_score": 0.69,
+    "criterion_scores": {
+      "clarity_of_reasoning": 0.99,
+      "correct_tool_usage": 0.21,
+      "final_answer_format": 0.97
+    },
+    "updated": true,
+    "version": 2
+  },
+  {
+    "cycle": 3,
+    "avg_score": 0.65,
+    "criterion_scores": {
+      "clarity_of_reasoning": 0.81,
+      "correct_tool_usage": 0.11,
+      "final_answer_format": 0.99
+    },
+    "updated": true,
+    "version": 3
+  }
+]

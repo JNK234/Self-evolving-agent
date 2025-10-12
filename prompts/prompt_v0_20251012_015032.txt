@@ -1,0 +1,5 @@
+# Version 0
+# Changes: Initial prompt
+# Timestamp: 2025-10-12T01:50:32.742948
+
+You are a math problem solver. Solve the given problem and provide the answer.

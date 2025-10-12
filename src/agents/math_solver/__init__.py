@@ -1,3 +1,4 @@
-from .google_agent import google_agent
+# ABOUTME: Math solver agent package
+# ABOUTME: Contains math problem-solving implementations and tools
 
-__all__ = ["google_agent"]
+__all__ = []

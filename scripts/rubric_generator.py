@@ -9,7 +9,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 load_dotenv()
 
 
-def generate_rubric(description: str, output_file: str = "rubric.json") -> dict:
+def generate_rubric(description: str, output_file: str = "src/agents/math_solver/rubric.json") -> dict:
     """
     Generate a structured rubric from a human description.
 

@@ -14,7 +14,7 @@ load_dotenv()
 class Critic:
     """Evaluates agent solutions using LLM-based pattern analysis."""
 
-    def __init__(self, rubric_path: str = "rubric.json", model: str = "gemini-2.0-flash"):
+    def __init__(self, rubric_path: str = "src/agents/math_solver/rubric.json", model: str = "gemini-2.0-flash"):
         self.model = model
         with open(rubric_path, 'r') as f:
             self.rubric = json.load(f)

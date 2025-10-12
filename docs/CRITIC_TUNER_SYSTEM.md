@@ -42,7 +42,7 @@ Traditional prompt optimization requires manual pattern detection and hardcoded 
 - `prompt_templates/sea/updater_v2.txt` - Prompt modification instructions
 
 **Configuration:**
-- `rubric.json` - Evaluation criteria with weights and expected patterns
+- `src/agents/math_solver/rubric.json` - Evaluation criteria with weights and expected patterns
 
 ## Complete Execution Flow
 
@@ -296,9 +296,9 @@ Located in `prompt_templates/` directory with organized structure:
   - Other agent domains can be added as subdirectories
 
 **Evaluation Configuration:**
-- `rubric.json` - Located in project root
+- `src/agents/math_solver/rubric.json` - Math solver evaluation rubric
 - Contains evaluation criteria, weights, and expected patterns
-- Domain-specific rubrics can be created for different agents
+- Domain-specific rubrics can be created in respective agent directories
 
 ### Underlying Agent Integration
 
@@ -724,7 +724,7 @@ All improvements identified and applied through LLM analysis - no manual interve
 
 **Solution:**
 - Try lower threshold (e.g., `--threshold 0.70`)
-- Review rubric criteria and weights in `rubric.json`
+- Review rubric criteria and weights in `src/agents/math_solver/rubric.json`
 - Check that problems actually test the criteria
 - Verify updater prompt template exists and is valid
 
@@ -736,12 +736,12 @@ All improvements identified and applied through LLM analysis - no manual interve
 
 **Common Causes:**
 1. **Wrong prompt template** - Using cycle prompt for individual eval
-2. **Rubric format issues** - Missing required fields in `rubric.json`
+2. **Rubric format issues** - Missing required fields in rubric
 3. **LLM response format** - Not matching expected structure
 
 **Solution:**
 - Verify `sea_critic_eval.txt` exists and has correct placeholders
-- Check `rubric.json` has required fields: criteria, weight, expected_pattern
+- Check rubric has required fields: criteria, weight, expected_pattern
 - Review LLM responses for correct JSON structure
 
 ### Issue: Performance Degradation

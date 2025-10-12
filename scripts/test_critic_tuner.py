@@ -21,7 +21,7 @@ Step 2: Calculate remaining eggs
 def test_rubric_loading():
     """Test that rubric loads correctly."""
     print("Testing rubric loading...")
-    with open("rubric.json", 'r') as f:
+    with open("src/agents/math_solver/rubric.json", 'r') as f:
         rubric = json.load(f)
     print(f"✓ Rubric loaded with {len(rubric['criteria'])} criteria")
     for criterion in rubric['criteria']:
