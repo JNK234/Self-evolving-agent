@@ -7,7 +7,7 @@ import logging
 import pandas as pd
 from src.llm.inference import run_react_agent
 from src.agents.tools.langchain_calculator import calculator_tool
-from src.utils.save_evals import extract_answer, save_eval_results
+from src.utils.evals_utils import extract_answer, save_eval_results
 
 load_dotenv()
 
