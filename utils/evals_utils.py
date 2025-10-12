@@ -23,12 +23,10 @@ def extract_boolean(text):
     match = re.search(r'####\s*(True|False)', text, re.IGNORECASE)
     return match.group(1).capitalize() if match else None
 
-
-# Add this function to your evals_utils.py
 @weave.op()
 def evaluate_with_llm(question: str, expected_answer: str, model_response: str) -> Dict[str, Any]:
     """
-    Simple LLM-based evaluation of a model response.
+    LLM-based evaluation of a model response.
     
     Args:
         question: The original question
@@ -45,7 +43,7 @@ def evaluate_with_llm(question: str, expected_answer: str, model_response: str) 
     # Create prompt template
     prompt_template = PromptTemplate.from_template(eval_prompt)
     
-    # Initialize LLM (using your existing setup)
+    # Initialize LLM
     llm = ChatOpenAI(
         base_url=os.getenv("WB_INFERENCE_BASE_URL"),
         api_key=os.getenv("WANDB_API_KEY"),
@@ -64,14 +62,26 @@ def evaluate_with_llm(question: str, expected_answer: str, model_response: str) 
     eval_text = response.content
     result = {"raw_evaluation": eval_text, "correct": None, "reasoning": None}
     
-    # Simple parsing
+    # Improved parsing logic
     lines = eval_text.split('\n')
     for line in lines:
+        line = line.strip()
         if line.startswith('CORRECT:'):
             correct_str = line.split(':', 1)[1].strip()
             result["correct"] = correct_str.lower() == 'true'
         elif line.startswith('REASONING:'):
             result["reasoning"] = line.split(':', 1)[1].strip()
+    
+    # Fallback: if parsing failed, try to extract boolean from the text
+    if result["correct"] is None:
+        if 'true' in eval_text.lower():
+            result["correct"] = True
+        elif 'false' in eval_text.lower():
+            result["correct"] = False
+        else:
+            # Default to False if we can't determine
+            result["correct"] = False
+            result["reasoning"] = "Could not parse evaluation result"
     
     return result
 
@@ -82,7 +92,7 @@ def log_to_wandb(model_name: str, total: int, correct: int, accuracy: float,
     Log evaluation results to Weights & Biases with proper bar chart visualization.
     """
     if run_name is None:
-        run_name = f"gsm8k_eval_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        run_name = f"math500_eval_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     
     # Initialize wandb run
     wandb.init(
@@ -91,7 +101,7 @@ def log_to_wandb(model_name: str, total: int, correct: int, accuracy: float,
         config={
             "model_name": model_name,
             "model_type": model_type,
-            "dataset": "GSM8K",
+            "dataset": "MATH-500",  # Changed from GSM8K
             "total_examples": total,
             "evaluation_method": "LLM-based" if len(responses) > 0 else "extraction"
         }
@@ -149,6 +159,7 @@ def log_to_wandb(model_name: str, total: int, correct: int, accuracy: float,
     wandb.finish()
     print(f"Results logged to Weights & Biases: {run_name}")
     return run_name
+
 def save_eval_results(model_name, total, correct, incorrect, accuracy, responses, run_name=None):
     """
     Save evaluation results to file (keep existing functionality)
@@ -162,7 +173,7 @@ def save_eval_results(model_name, total, correct, incorrect, accuracy, responses
     filename = f"eval_results/{run_name}_{model_name.replace('/', '_')}.txt"
     
     with open(filename, 'w') as f:
-        f.write(f"GSM8K Evaluation Results\n")
+        f.write(f"MATH-500 Evaluation Results\n")  # Changed from GSM8K
         f.write(f"=" * 50 + "\n\n")
         f.write(f"Model: {model_name}\n")
         f.write(f"Run Name: {run_name}\n")

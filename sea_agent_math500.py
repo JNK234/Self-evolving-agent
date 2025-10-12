@@ -11,6 +11,7 @@ from datetime import datetime
 # Initialize Weave for automatic tracing
 WEAVE_PROJECT = os.getenv("WEAVE_PROJECT_NAME", "self-evolving-agent")
 weave.init(WEAVE_PROJECT)
+
 @weave.op()
 def solve_problem(query: str, current_prompt: str) -> Tuple[str, str]:
     """Solve a problem using the current prompt"""
@@ -40,9 +41,9 @@ def run_sea_agent(total_problems: int = 100, update_frequency: int = 5) -> Dict[
     Returns:
         Dictionary with evaluation results
     """
-    # Load GSM8K dataset
-    ds = load_dataset("openai/gsm8k", "main")
-    dataset = ds['train'][:total_problems]
+    # Load MATH-500 dataset
+    ds = load_dataset("HuggingFaceH4/MATH-500")
+    dataset = ds['test'][:total_problems]
     
     # Initialize tracking variables
     current_prompt = None
@@ -60,29 +61,29 @@ def run_sea_agent(total_problems: int = 100, update_frequency: int = 5) -> Dict[
     print(f"Starting SEA Agent evaluation on {total_problems} problems...")
     print(f"Prompt will be updated every {update_frequency} problems")
     
-    for i, (query, answer) in enumerate(zip(dataset['question'], dataset['answer'])):
+    for i, (problem, solution, answer) in enumerate(zip(dataset['problem'], dataset['solution'], dataset['answer'])):
         print(f"\n--- Problem {i+1}/{total_problems} ---")
         print(f"Current prompt version: {len(prompt_versions) + 1}")
         
         # Solve the problem with current prompt
-        response, _ = solve_problem(query, current_prompt)
+        response, _ = solve_problem(problem, current_prompt)
         
         # Use evaluate_with_llm instead of exact matching
-        eval_result = evaluate_with_llm(query, answer, response)
+        eval_result = evaluate_with_llm(problem, answer, response)
         is_correct = eval_result.get("correct", False)
         
         if is_correct:
             correct_count += 1
-            print("CORRECT")
+            print("✓ CORRECT")
         else:
-            print("INCORRECT")
+            print("✗ INCORRECT")
             print(f"Expected: {answer[:100]}...")
             print(f"Got: {response[:100]}...")
         
         # Store results
         all_responses.append({
             "problem_id": i + 1,
-            "question": query,
+            "question": problem,
             "expected_answer": answer,
             "predicted_answer": response,
             "response": response,
@@ -94,7 +95,7 @@ def run_sea_agent(total_problems: int = 100, update_frequency: int = 5) -> Dict[
         
         # Update prompt every n problems
         if (i + 1) % update_frequency == 0 and i > 0:
-            print(f"\nRunning critic on {update_frequency} problems...")
+            print(f"\n🔄 Running critic on {update_frequency} problems...")
             
             # Get the recent problems for critic evaluation
             recent_problems = all_responses[-update_frequency:]
@@ -107,7 +108,7 @@ def run_sea_agent(total_problems: int = 100, update_frequency: int = 5) -> Dict[
             recent_incorrect = any(not resp["is_correct"] for resp in recent_problems)
             
             if recent_incorrect:
-                print(f"\nUpdating prompt after {update_frequency} problems...")
+                print(f"\n🔄 Updating prompt after {update_frequency} problems...")
                 
                 # Use the first incorrect problem for prompt update
                 incorrect_problems = [p for p in recent_problems if not p["is_correct"]]
@@ -133,7 +134,7 @@ def run_sea_agent(total_problems: int = 100, update_frequency: int = 5) -> Dict[
                     
                     # Update current prompt
                     current_prompt = new_prompt
-                    print(f"Prompt updated to version {len(prompt_versions) + 1}")
+                    print(f"✅ Prompt updated to version {len(prompt_versions) + 1}")
                 else:
                     print("No incorrect problems found, keeping current prompt")
             else:
@@ -162,7 +163,7 @@ def run_sea_agent(total_problems: int = 100, update_frequency: int = 5) -> Dict[
     with open(final_prompt_filename, "w") as f:
         f.write(current_prompt)
     
-    print(f"Final evolved prompt saved to: {final_prompt_filename}")
+    print(f"💾 Final evolved prompt saved to: {final_prompt_filename}")
 
     results = {
         "total_problems": total_problems,
@@ -205,7 +206,7 @@ def test_final_solver(test_problems: int = 10, prompt_file: str = None) -> Dict[
     """
     Test the final evolved solver on new problems
     """
-    print(f"\nTesting final solver on {test_problems} new problems...")
+    print(f"\n🧪 Testing final solver on {test_problems} new problems...")
     
     # Load the final prompt
     if prompt_file is None:
@@ -224,28 +225,28 @@ def test_final_solver(test_problems: int = 10, prompt_file: str = None) -> Dict[
         with open(prompt_file, "r") as f:
             final_prompt = f.read()
     except FileNotFoundError:
-        print(f"Prompt file not found: {prompt_file}")
+        print(f"❌ Prompt file not found: {prompt_file}")
         return None
 
-    # Load test dataset
-    ds = load_dataset("openai/gsm8k", "main")
-    dataset = ds['test'][100:100+test_problems]
+    # Load test dataset (use different problems from MATH-500)
+    ds = load_dataset("HuggingFaceH4/MATH-500")
+    dataset = ds['test'][100:100+test_problems]  # Use different problems for testing
     
     correct = 0
     test_responses = []
     
-    for i, (query, answer) in enumerate(zip(dataset['question'], dataset['answer'])):
+    for i, (problem, solution, answer) in enumerate(zip(dataset['problem'], dataset['solution'], dataset['answer'])):
         print(f"\nTest Problem {i+1}:")
-        response, _ = solve_problem(query, final_prompt)
+        response, _ = solve_problem(problem, final_prompt)
         
         # Use evaluate_with_llm for evaluation
-        eval_result = evaluate_with_llm(query, answer, response)
+        eval_result = evaluate_with_llm(problem, answer, response)
         is_correct = eval_result.get("correct", False)
         
         # Store test results
         test_responses.append({
             "problem_id": i + 1,
-            "question": query,
+            "question": problem,
             "expected_answer": answer,
             "predicted_answer": response,
             "response": response,
@@ -297,15 +298,15 @@ def test_final_solver(test_problems: int = 10, prompt_file: str = None) -> Dict[
 
 if __name__ == "__main__":
     # Run the SEA agent system
-    print("Starting Self-Evolving Agent training...")
-    results = run_sea_agent(total_problems=30, update_frequency=10)
+    print("🚀 Starting Self-Evolving Agent training on MATH-500...")
+    results = run_sea_agent(total_problems=30, update_frequency=5)
     
     # Test the final solver
-    print("\nTesting the evolved solver...")
-    test_results = test_final_solver(test_problems=10)
+    print("\n🧪 Testing the evolved solver...")
+    test_results = test_final_solver(test_problems=30)
     
     if test_results:
-        print(f"\nSummary:")
+        print(f"\n📊 Summary:")
         print(f"Training accuracy: {results['final_accuracy']:.3f}")
         print(f"Test accuracy: {test_results['test_accuracy']:.3f}")
         print(f"Improvement: {test_results['test_accuracy'] - results['final_accuracy']:.3f}")

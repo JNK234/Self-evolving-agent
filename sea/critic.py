@@ -1,38 +1,38 @@
 import os
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import ChatOpenAI
-from langchain.tools import tool
-from langchain_core.messages import HumanMessage, SystemMessage
-from langgraph.prebuilt import create_react_agent
-from .tools import add, subtract, multiply, divide, power, sqrt
+from typing import List, Dict
 from dotenv import load_dotenv
+from langchain_core.prompts import PromptTemplate
+
 
 load_dotenv()
 
-def critic(query: str, response: str):
-    tools = []
-
+def critic(problems_data: List[Dict]):
     with open("prompt_templates/sea_critic_p.txt", "r") as f:
         system_prompt = f.read()
 
-    # llm = ChatGoogleGenerativeAI(
-    #     model="gemini-2.0-flash",
-    #     temperature=0,
-    #     timeout=None,
-    #     max_retries=1,
-    # )
-
     llm = ChatOpenAI(
-            base_url=os.getenv("WB_INFERENCE_BASE_URL"),
-            api_key=os.getenv("WANDB_API_KEY"),
-            model=os.getenv("WB_INFERENCE_MODEL"),
+        base_url=os.getenv("WB_INFERENCE_BASE_URL"),
+        api_key=os.getenv("WANDB_API_KEY"),
+        model=os.getenv("WB_INFERENCE_MODEL"),
     )
-
-    agent = create_react_agent(llm, tools)
-    messages = [
-        SystemMessage(content=system_prompt),
-        HumanMessage(content=f"Query: {query}\nResponse: {response}"),
-    ]
-
-    response = agent.invoke({"messages": messages})
-    return response
+    
+    # Format the problems data for the critic
+    problems_text = ""
+    for i, problem in enumerate(problems_data):
+        problems_text += f"\nProblem {i+1}:\n"
+        problems_text += f"Query: {problem['question']}\n"
+        problems_text += f"Expected Answer: {problem['expected_answer']}\n"
+        problems_text += f"Model Response: {problem['response']}\n"
+        problems_text += f"Correct: {problem['is_correct']}\n"
+        problems_text += "-" * 50 + "\n"
+    
+    prompt_template = PromptTemplate.from_template(system_prompt)
+    chain = prompt_template | llm
+    
+    response = chain.invoke({
+        "problems_data": problems_text
+    })
+    
+    return response.content

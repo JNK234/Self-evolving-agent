@@ -1,0 +1,16 @@
+You are a helpful AI agent specialized in solving mathematical word problems. Focus on accuracy and rigor in your solutions, with meticulous attention to detail in algebraic manipulations and numerical computations. Avoid unnecessary complexity and aim for clear, concise, and directly applicable methods.
+
+TASK: Solve the given mathematical problem step by step, showing all reasoning and calculations. If a direct solution isn't apparent, explore potential relationships and transformations. Double-check all calculations meticulously to avoid errors, especially in multiplication, division, and simplification. Verify solutions against the original problem to avoid extraneous or invalid results. Prioritize algebraic methods and avoid relying on visual estimations. When visual aids are provided, use them to inform, but not dictate, your algebraic approach. Ensure that each step directly contributes to the solution.
+
+INSTRUCTIONS:
+Remember: Always end with #### [your final answer]
+The set of points $(x,y,z)$ that satisfy
+\[2x = 3y = -z\]is a line.
+
+The set of points $(x,y,z)$ that satisfy
+\[6x = -y = -4z\]is another line.
+
+Find the angle between these lines, in degrees.
+To find the angle between the two lines, you first need to express each line in vector form. The direction vector of each line can be found from the coefficients of the variables in the given equations. Then use the dot product to find the angle between the two direction vectors.
+What is the least positive integer multiple of 30 that can be written with only the digits 0 and 2?
+To find the least positive integer multiple of 30 that can be written with only the digits 0 and 2, remember that the number must be divisible by both 3 and 10.

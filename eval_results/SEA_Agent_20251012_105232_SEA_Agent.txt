@@ -1,0 +1,119 @@
+GSM8K Evaluation Results
+==================================================
+
+Model: SEA_Agent
+Run Name: SEA_Agent_20251012_105232
+Total Examples Tested: 30
+Correct: 24
+Incorrect: 6
+Accuracy: 0.8000 (80.00%)
+
+Example Responses:
+------------------------------
+
+Example 1:
+Question: Natalia sold clips to 48 of her friends in April, and then she sold half as many clips in May. How many clips did Natalia sell altogether in April and May?
+Expected Answer: Natalia sold 48/2 = <<48/2=24>>24 clips in May.
+Natalia sold 48+24 = <<48+24=72>>72 clips altogether in April and May.
+#### 72
+Model Response: You are a helpful AI agent specialized in solving mathematical word problems.
+
+TASK: Solve the given mathematical problem step by step using the available tools.
+
+INSTRUCTIONS:
+Remember: Always end with #### [your final answer]
+Natalia sold clips to 48 of her friends in April, and then she sold half as many clips in May. How many clips did Natalia sell altogether in April and May?
+To calculate the total number of clips Natalia sold in April and May, we first need to determine how many clipped were sold in May. Since she sold half as many in May as she did in April, we can find the number of clips sold in May by dividing April's sales by 2.
+
+Number of clips sold in May = 48 / 2 = 24
+
+Now, we can find the total number of clips sold in April and May by adding the number of clips sold in April to the number sold in May.
+
+Total clips sold = April sales + May sales
+Total clips sold = 48 + 24
+Total clips sold = 72
+
+Natalia sold 72 clips altogether in April and May.
+Extracted Answer: You are a helpful AI agent specialized in solving mathematical word problems.
+
+TASK: Solve the given mathematical problem step by step using the available tools.
+
+INSTRUCTIONS:
+Remember: Always end with #### [your final answer]
+Natalia sold clips to 48 of her friends in April, and then she sold half as many clips in May. How many clips did Natalia sell altogether in April and May?
+To calculate the total number of clips Natalia sold in April and May, we first need to determine how many clipped were sold in May. Since she sold half as many in May as she did in April, we can find the number of clips sold in May by dividing April's sales by 2.
+
+Number of clips sold in May = 48 / 2 = 24
+
+Now, we can find the total number of clips sold in April and May by adding the number of clips sold in April to the number sold in May.
+
+Total clips sold = April sales + May sales
+Total clips sold = 48 + 24
+Total clips sold = 72
+
+Natalia sold 72 clips altogether in April and May.
+Expected Answer: Natalia sold 48/2 = <<48/2=24>>24 clips in May.
+Natalia sold 48+24 = <<48+24=72>>72 clips altogether in April and May.
+#### 72
+Correct: Yes
+
+------------------------------
+
+Example 2:
+Question: Weng earns $12 an hour for babysitting. Yesterday, she just did 50 minutes of babysitting. How much did she earn?
+Expected Answer: Weng earns 12/60 = $<<12/60=0.2>>0.2 per minute.
+Working 50 minutes, she earned 0.2 x 50 = $<<0.2*50=10>>10.
+#### 10
+Model Response: You are a helpful AI agent specialized in solving mathematical word problems.
+
+TASK: Solve the given mathematical problem step by step using the available tools.
+
+INSTRUCTIONS:
+Remember: Always end with #### [your final answer]
+Weng earns $12 an hour for babysitting. Yesterday, she just did 50 minutes of babysitting. How much did she earn?
+To calculate Weng's earnings, we need to determine the portion of an hour she worked and then apply her hourly rate.
+
+First, we'll convert the 50 minutes she worked into hours. There are 60 minutes in an hour, so we divide 50 by 60 to get the fraction of the hour she worked.
+
+Then, we'll multiply that fraction by her hourly rate of $12.
+
+Here's the calculation using the divide and multiply functions:
+
+```json
+[
+    {"name": "divide", "arguments": {"a": 50, "b": 60}},
+    {"name": "multiply", "arguments": {"a": "result from above", "b": 12}}
+]
+```
+
+Please note that the first step is to perform the division, and the result of that division is used as the "a" in the second function call. However, as I cannot actually call these functions, you would need to perform these calculations manually or use an appropriate programming environment to get the final amount.
+Extracted Answer: You are a helpful AI agent specialized in solving mathematical word problems.
+
+TASK: Solve the given mathematical problem step by step using the available tools.
+
+INSTRUCTIONS:
+Remember: Always end with #### [your final answer]
+Weng earns $12 an hour for babysitting. Yesterday, she just did 50 minutes of babysitting. How much did she earn?
+To calculate Weng's earnings, we need to determine the portion of an hour she worked and then apply her hourly rate.
+
+First, we'll convert the 50 minutes she worked into hours. There are 60 minutes in an hour, so we divide 50 by 60 to get the fraction of the hour she worked.
+
+Then, we'll multiply that fraction by her hourly rate of $12.
+
+Here's the calculation using the divide and multiply functions:
+
+```json
+[
+    {"name": "divide", "arguments": {"a": 50, "b": 60}},
+    {"name": "multiply", "arguments": {"a": "result from above", "b": 12}}
+]
+```
+
+Please note that the first step is to perform the division, and the result of that division is used as the "a" in the second function call. However, as I cannot actually call these functions, you would need to perform these calculations manually or use an appropriate programming environment to get the final amount.
+Expected Answer: Weng earns 12/60 = $<<12/60=0.2>>0.2 per minute.
+Working 50 minutes, she earned 0.2 x 50 = $<<0.2*50=10>>10.
+#### 10
+Correct: Yes
+
+------------------------------
+

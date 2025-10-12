@@ -1,0 +1,83 @@
+GSM8K Evaluation Results
+==================================================
+
+Model: SEA_Agent
+Run Name: SEA_Agent_20251012_110542
+Total Examples Tested: 30
+Correct: 28
+Incorrect: 2
+Accuracy: 0.9333 (93.33%)
+
+Example Responses:
+------------------------------
+
+Example 1:
+Question: Natalia sold clips to 48 of her friends in April, and then she sold half as many clips in May. How many clips did Natalia sell altogether in April and May?
+Expected Answer: Natalia sold 48/2 = <<48/2=24>>24 clips in May.
+Natalia sold 48+24 = <<48+24=72>>72 clips altogether in April and May.
+#### 72
+Model Response: You are a helpful AI agent specialized in solving mathematical word problems.
+
+TASK: Solve the given mathematical problem step by step using the available tools.
+
+INSTRUCTIONS:
+Remember: Always end with #### [your final answer]
+Natalia sold clips to 48 of her friends in April, and then she sold half as many clips in May. How many clips did Natalia sell altogether in April and May?
+To calculate the total number of clips Natalia sold, we need to add the number of clips sold in April to half the number sold in May.
+
+First, let's calculate the number of clips sold in May:
+Half of 48 is 48 / 2 = 24
+
+Now, let's add the number of clips sold in April (48) to the number sold in May (24):
+48 + 24 = 72
+
+Natalia sold a total of 72 clips in April and May.
+Extracted Answer: You are a helpful AI agent specialized in solving mathematical word problems.
+
+TASK: Solve the given mathematical problem step by step using the available tools.
+
+INSTRUCTIONS:
+Remember: Always end with #### [your final answer]
+Natalia sold clips to 48 of her friends in April, and then she sold half as many clips in May. How many clips did Natalia sell altogether in April and May?
+To calculate the total number of clips Natalia sold, we need to add the number of clips sold in April to half the number sold in May.
+
+First, let's calculate the number of clips sold in May:
+Half of 48 is 48 / 2 = 24
+
+Now, let's add the number of clips sold in April (48) to the number sold in May (24):
+48 + 24 = 72
+
+Natalia sold a total of 72 clips in April and May.
+Expected Answer: Natalia sold 48/2 = <<48/2=24>>24 clips in May.
+Natalia sold 48+24 = <<48+24=72>>72 clips altogether in April and May.
+#### 72
+Correct: Yes
+
+------------------------------
+
+Example 2:
+Question: Weng earns $12 an hour for babysitting. Yesterday, she just did 50 minutes of babysitting. How much did she earn?
+Expected Answer: Weng earns 12/60 = $<<12/60=0.2>>0.2 per minute.
+Working 50 minutes, she earned 0.2 x 50 = $<<0.2*50=10>>10.
+#### 10
+Model Response: You are a helpful AI agent specialized in solving mathematical word problems.
+
+TASK: Solve the given mathematical problem step by step using the available tools.
+
+INSTRUCTIONS:
+Remember: Always end with #### [your final answer]
+Weng earns $12 an hour for babysitting. Yesterday, she just did 50 minutes of babysitting. How much did she earn?
+Extracted Answer: You are a helpful AI agent specialized in solving mathematical word problems.
+
+TASK: Solve the given mathematical problem step by step using the available tools.
+
+INSTRUCTIONS:
+Remember: Always end with #### [your final answer]
+Weng earns $12 an hour for babysitting. Yesterday, she just did 50 minutes of babysitting. How much did she earn?
+Expected Answer: Weng earns 12/60 = $<<12/60=0.2>>0.2 per minute.
+Working 50 minutes, she earned 0.2 x 50 = $<<0.2*50=10>>10.
+#### 10
+Correct: Yes
+
+------------------------------
+
