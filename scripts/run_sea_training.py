@@ -155,6 +155,235 @@ def save_eval_results(model_name: str, total: int, correct: int, incorrect: int,
     print(f"✓ Results saved to: {filename}")
 
 
+def fetch_weave_evaluations(project_name: str, num_traces: int = 50) -> Dict[str, Any]:
+    """
+    Fetch and analyze existing evaluations from Weave project.
+
+    Args:
+        project_name: Weave project name
+        num_traces: Number of recent traces to fetch
+
+    Returns:
+        Dictionary with evaluation statistics and traces
+    """
+    print(f"\n{'='*70}")
+    print("FETCHING WEAVE EVALUATIONS")
+    print(f"{'='*70}\n")
+
+    fetcher = WeaveTraceFetcher(project_name)
+
+    # Fetch all recent traces without filtering
+    traces = fetcher.fetch_recent_traces(
+        num_traces=num_traces,
+        op_name_filter=None,
+        trace_roots_only=True
+    )
+
+    if not traces:
+        print("⚠️  No traces found in project")
+        return {
+            "total_traces": 0,
+            "traces": [],
+            "statistics": {}
+        }
+
+    # Get trace statistics
+    stats = fetcher.get_trace_statistics(traces)
+
+    print(f"✓ Fetched {len(traces)} evaluation traces")
+    print(f"  - Average latency: {stats['avg_latency_ms']:.2f}ms")
+    print(f"  - Tools used: {', '.join(stats['tools_used']) if stats['tools_used'] else 'None'}")
+    print(f"  - Status distribution: {stats['status_distribution']}")
+
+    return {
+        "total_traces": len(traces),
+        "traces": traces,
+        "statistics": stats
+    }
+
+
+def run_testing_mode(
+    test_problems: int = 50,
+    use_llm_eval: bool = True,
+    experiment_id: str = None,
+    agent_name: str = "math_solver",
+    dataset_name: str = "gsm8k",
+    prompt_file: str = None,
+    prompt_name: str = "math_solver_prompt",
+    fetch_from_weave: bool = False
+) -> Dict[str, Any]:
+    """
+    Run testing mode - evaluate existing prompt and tools without training.
+
+    Args:
+        test_problems: Number of test problems to evaluate
+        use_llm_eval: Use LLM-based evaluation
+        experiment_id: Experiment identifier
+        agent_name: Agent name for tool loading
+        dataset_name: Dataset to use
+        prompt_file: Path to prompt file (if None, fetches latest from Weave)
+        prompt_name: Weave prompt name to fetch if prompt_file is None
+        fetch_from_weave: If True, fetch and analyze existing Weave evaluations
+
+    Returns:
+        Dictionary with testing results
+    """
+    print("="*70)
+    print("TESTING MODE - Evaluate Existing Prompt & Tools")
+    print("="*70)
+
+    # Load configuration
+    config = get_config()
+
+    print("\nConfiguration:")
+    print(f"  Solver: {config['llm_config']['solver']['provider']} - {config['llm_config']['solver']['model_name']}")
+    print(f"  Agent: {agent_name}")
+    print(f"  Dataset: {dataset_name}")
+    print(f"  LLM Evaluation: {'Enabled' if use_llm_eval else 'Disabled'}")
+    if experiment_id:
+        print(f"  Experiment ID: {experiment_id}")
+
+    # Initialize Weave
+    weave_project = os.getenv("WEAVE_PROJECT_NAME")
+    if not weave_project:
+        raise ValueError("WEAVE_PROJECT_NAME must be set in .env file")
+    weave.init(weave_project)
+    print(f"\n✓ Weave initialized: {weave_project}")
+
+    # Fetch existing Weave evaluations if requested
+    weave_data = None
+    if fetch_from_weave:
+        weave_data = fetch_weave_evaluations(weave_project, num_traces=test_problems)
+        if weave_data["total_traces"] > 0:
+            print(f"\n✓ Fetched {weave_data['total_traces']} existing evaluations from Weave")
+
+    # Load prompt
+    if prompt_file and os.path.exists(prompt_file):
+        with open(prompt_file, "r") as f:
+            prompt_text = f.read()
+        print(f"✓ Loaded prompt from: {prompt_file}")
+    else:
+        # Fetch latest version from Weave
+        try:
+            final_prompt_name = f"{prompt_name}_{experiment_id}" if experiment_id else prompt_name
+            prompt_obj = weave.ref(final_prompt_name).get()
+            prompt_text = prompt_obj.content if hasattr(prompt_obj, 'content') else str(prompt_obj)
+            print(f"✓ Fetched latest prompt from Weave: '{final_prompt_name}'")
+        except Exception as e:
+            print(f"⚠️  Failed to fetch prompt from Weave: {e}")
+            print("   Using default prompt from config")
+            prompt_text = "Solve the following math problem step by step."
+
+    # Load dataset
+    if dataset_name.lower() == "math500":
+        ds = load_dataset("HuggingFaceH4/MATH-500")
+        dataset = ds['test'][13:13+test_problems]
+    else:
+        ds = load_dataset("openai/gsm8k", "main")
+        dataset = ds['test'][:test_problems]  # Use test split for evaluation
+
+    dataset_display = "MATH-500" if dataset_name.lower() == "math500" else "GSM8K"
+    print(f"✓ Loaded {test_problems} {dataset_display} test problems\n")
+
+    # Run evaluation
+    all_responses = []
+    correct_count = 0
+
+    prompt_obj = weave.StringPrompt(prompt_text)
+
+    # Handle different dataset formats
+    if dataset_name.lower() == "math500":
+        questions = dataset['problem']
+        answers = dataset['answer']
+    else:
+        questions = dataset['question']
+        answers = dataset['answer']
+
+    print(f"Starting evaluation on {test_problems} test problems...\n")
+
+    for i, (query, answer) in enumerate(zip(questions, answers)):
+        print(f"Problem {i+1}/{test_problems}", end=" ")
+
+        # Solve problem
+        response = solve_problem(query, prompt_obj, agent_name)
+
+        # Evaluate
+        if use_llm_eval:
+            eval_result = evaluate_with_llm(query, answer, response)
+            is_correct = eval_result.get("correct", False)
+        else:
+            predicted = extract_answer(response)
+            expected = extract_answer(answer)
+            is_correct = (predicted == expected) if predicted and expected else False
+
+        if is_correct:
+            correct_count += 1
+            print("✓")
+        else:
+            print("✗")
+
+        all_responses.append({
+            "problem_id": i + 1,
+            "question": query,
+            "expected_answer": answer,
+            "predicted_answer": response,
+            "is_correct": is_correct
+        })
+
+    # Calculate final accuracy
+    final_accuracy = correct_count / test_problems
+
+    print(f"\n{'='*70}")
+    print("TESTING COMPLETE")
+    print(f"{'='*70}")
+    print(f"Total Problems: {test_problems}")
+    print(f"Correct: {correct_count}")
+    print(f"Incorrect: {test_problems - correct_count}")
+    print(f"Accuracy: {final_accuracy:.4f} ({final_accuracy*100:.2f}%)")
+
+    # Log to wandb
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    exp_prefix = f"{experiment_id}_" if experiment_id else ""
+    run_name = f"{exp_prefix}Testing_{timestamp}"
+
+    log_to_wandb(
+        f"{agent_name}_test",
+        test_problems,
+        correct_count,
+        final_accuracy,
+        all_responses,
+        run_name,
+        f"Testing_{agent_name}",
+        dataset_display
+    )
+
+    # Save results
+    save_eval_results(
+        f"{agent_name}_test",
+        test_problems,
+        correct_count,
+        test_problems - correct_count,
+        final_accuracy,
+        all_responses,
+        run_name
+    )
+
+    results = {
+        "total_problems": test_problems,
+        "correct": correct_count,
+        "incorrect": test_problems - correct_count,
+        "accuracy": final_accuracy,
+        "responses": all_responses,
+        "weave_evaluations": weave_data
+    }
+
+    print(f"\n✓ Results logged to wandb: {run_name}")
+    print(f"✓ Check Weave UI: {weave_project}")
+    print(f"{'='*70}\n")
+
+    return results
+
+
 @weave.op()
 def solve_problem(query: str, prompt_obj: weave.StringPrompt, agent_name: str = "math_solver") -> str:
     """
@@ -229,7 +458,7 @@ def run_sea_training(
     # Get update frequency from config
     update_frequency = si_config.get("trigger_every_n_runs", 10)
 
-    print(f"\nConfiguration:")
+    print("\nConfiguration:")
     print(f"  Solver: {config['llm_config']['solver']['provider']} - {config['llm_config']['solver']['model_name']}")
     print(f"  Critic: {config['llm_config']['critic']['provider']} - {config['llm_config']['critic']['model_name']}")
     print(f"  Updater: {config['llm_config']['updater']['provider']} - {config['llm_config']['updater']['model_name']}")
@@ -533,31 +762,77 @@ def run_sea_training(
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="Run SEA training with unified architecture")
-    parser.add_argument("--problems", type=int, default=50, help="Total problems to solve")
-    parser.add_argument("--llm-eval", action="store_true", help="Use LLM-based evaluation")
-    parser.add_argument("--enable-atc", action="store_true", help="Enable Automatic Tool Creation")
+    parser = argparse.ArgumentParser(
+        description="Run SEA training or testing with unified architecture",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Run training mode with ATC
+  python run_sea_training.py --problems 50 --enable-atc --llm-eval
+
+  # Run testing mode with existing prompt/tools
+  python run_sea_training.py --test --problems 50 --llm-eval
+
+  # Test with specific prompt file
+  python run_sea_training.py --test --prompt my_prompt.txt --problems 20
+
+  # Test and fetch Weave evaluations
+  python run_sea_training.py --test --fetch-weave --problems 50
+        """
+    )
+
+    # Mode selection
+    parser.add_argument("--test", action="store_true",
+                       help="Run in testing mode (evaluate existing prompt/tools without training)")
+
+    # Common arguments
+    parser.add_argument("--problems", type=int, default=50,
+                       help="Total problems to solve (default: 50)")
+    parser.add_argument("--llm-eval", action="store_true",
+                       help="Use LLM-based evaluation instead of simple extraction")
     parser.add_argument("--experiment-id", type=str, default=None,
                        help="Experiment ID (prefixes all saved files and run names)")
     parser.add_argument("--agent", type=str, default="math_solver",
-                       help="Agent name from config.yaml")
+                       help="Agent name from config.yaml (default: math_solver)")
     parser.add_argument("--dataset", type=str, default="gsm8k",
                        choices=["gsm8k", "math500"],
-                       help="Dataset to use: gsm8k or math500")
+                       help="Dataset to use (default: gsm8k)")
     parser.add_argument("--prompt", type=str, default="prompt_templates/agents/math_solver/advanced.txt",
-                       help="Initial prompt file path")
+                       help="Prompt file path (for training) or prompt to test (for testing)")
     parser.add_argument("--prompt-name", type=str, default="math_solver_prompt",
-                       help="Name for tracking prompts in Weave (e.g., 'math_solver_prompt')")
+                       help="Name for tracking prompts in Weave")
+
+    # Training-specific arguments
+    parser.add_argument("--enable-atc", action="store_true",
+                       help="[Training only] Enable Automatic Tool Creation")
+
+    # Testing-specific arguments
+    parser.add_argument("--fetch-weave", action="store_true",
+                       help="[Testing only] Fetch and analyze existing Weave evaluations")
 
     args = parser.parse_args()
 
-    run_sea_training(
-        total_problems=args.problems,
-        use_llm_eval=args.llm_eval,
-        enable_atc=args.enable_atc,
-        experiment_id=args.experiment_id,
-        agent_name=args.agent,
-        dataset_name=args.dataset,
-        initial_prompt_file=args.prompt,
-        prompt_name=args.prompt_name
-    )
+    if args.test:
+        # Run testing mode
+        run_testing_mode(
+            test_problems=args.problems,
+            use_llm_eval=args.llm_eval,
+            experiment_id=args.experiment_id,
+            agent_name=args.agent,
+            dataset_name=args.dataset,
+            prompt_file=args.prompt if os.path.exists(args.prompt) else None,
+            prompt_name=args.prompt_name,
+            fetch_from_weave=args.fetch_weave
+        )
+    else:
+        # Run training mode
+        run_sea_training(
+            total_problems=args.problems,
+            use_llm_eval=args.llm_eval,
+            enable_atc=args.enable_atc,
+            experiment_id=args.experiment_id,
+            agent_name=args.agent,
+            dataset_name=args.dataset,
+            initial_prompt_file=args.prompt,
+            prompt_name=args.prompt_name
+        )
