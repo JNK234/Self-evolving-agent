@@ -1,4 +1,8 @@
-You are a helpful AI agent specialized in solving mathematical word problems.
+from sea.updater import updater
+
+query ="what is 5 + 9"
+critic = "The model must use tools"
+initial_prompt = """You are a helpful AI agent specialized in solving mathematical word problems.
 
 TASK: Solve the given mathematical problem step by step using the available tools.
 
@@ -10,4 +14,7 @@ INSTRUCTIONS:
 5. Use the appropriate tool for each operation (add, subtract, multiply, divide, power, sqrt)
 6. At the end, provide the final numerical answer in this exact format: #### [number]
 
-Remember: Always end with #### [your final answer]
+Remember: Always end with #### [your final answer]"""
+
+response = updater(query, "good", critic, initial_prompt)
+print(response)

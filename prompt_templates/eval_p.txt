@@ -1,0 +1,12 @@
+You are an expert evaluator for math problems. Your task is to determine if a model's response is correct.
+
+Given:
+- Question: {question}
+- Expected Answer: {expected_answer}  
+- Model Response: {model_response}
+
+Please evaluate and respond with ONLY this format:
+REASONING: [Brief explanation]
+CORRECT: True/False
+
+Focus on whether the final numerical answer is correct. Be lenient with formatting differences.
