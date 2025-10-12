@@ -37,9 +37,9 @@ Traditional prompt optimization requires manual pattern detection and hardcoded 
 - `sea/updater.py` - Updater class applies LLM-generated suggestions to prompts
 
 **LLM Prompt Templates:**
-- `prompt_templates/sea_critic_eval.txt` - Individual solution evaluation instructions
-- `prompt_templates/sea_critic_p_v2.txt` - Pattern analysis instructions
-- `prompt_templates/sea_updater_p_v2.txt` - Prompt modification instructions
+- `prompt_templates/sea/critic_eval.txt` - Individual solution evaluation instructions
+- `prompt_templates/sea/critic_pattern_v2.txt` - Pattern analysis instructions
+- `prompt_templates/sea/updater_v2.txt` - Prompt modification instructions
 
 **Configuration:**
 - `rubric.json` - Evaluation criteria with weights and expected patterns
@@ -81,7 +81,7 @@ The Critic evaluates each solution independently against the rubric criteria. It
 
 **Where:**
 - Implementation: `sea/critic.py` - `Critic.evaluate_solution()`
-- Prompt used: `prompt_templates/sea_critic_eval.txt`
+- Prompt used: `prompt_templates/sea/critic_eval.txt`
 - LLM decision: Assigns scores (0.0-1.0) per criterion, identifies issues
 
 **Output Structure:**
@@ -103,7 +103,7 @@ The Critic aggregates ALL individual evaluations and sends them to an LLM for pa
 
 **Where:**
 - Implementation: `sea/critic.py` - `Critic.evaluate_cycle()`
-- Prompt used: `prompt_templates/sea_critic_p_v2.txt`
+- Prompt used: `prompt_templates/sea/critic_pattern_v2.txt`
 - Data formatting: `Critic._format_evaluations()` prepares raw data for LLM
 
 **Key Insight:**
@@ -129,7 +129,7 @@ The Updater receives pattern-based suggestions and the current prompt. It sends 
 
 **Where:**
 - Implementation: `sea/updater.py` - `Updater.apply_suggestions()`
-- Prompt used: `prompt_templates/sea_updater_p_v2.txt`
+- Prompt used: `prompt_templates/sea/updater_v2.txt`
 - Suggestion selection: `Updater._select_suggestions()` prioritizes by LLM-assigned priority
 
 **Result:**
@@ -180,14 +180,14 @@ The Critic performs both granular and systemic evaluation. It acts as the analyt
 **Functionality:**
 
 **Phase 1 - Individual Evaluation:**
-- Loads evaluation instructions from `prompt_templates/sea_critic_eval.txt`
+- Loads evaluation instructions from `prompt_templates/sea/critic_eval.txt`
 - Scores each solution against rubric criteria independently
 - Generates solution-specific suggestions
 - Returns structured evaluation with scores and reasoning
 - Implementation: `evaluate_solution()` method
 
 **Phase 2 - Pattern Extraction:**
-- Loads pattern analysis instructions from `prompt_templates/sea_critic_p_v2.txt`
+- Loads pattern analysis instructions from `prompt_templates/sea/critic_pattern_v2.txt`
 - Aggregates all individual evaluations into formatted summary
 - Delegates pattern detection entirely to LLM (zero hardcoded thresholds)
 - LLM identifies repeated failures, rubric gaps, systemic issues
@@ -214,7 +214,7 @@ The Updater applies LLM-generated suggestions to prompts through minimal, target
 - Implementation: `_select_suggestions()` method
 
 **Prompt Modification:**
-- Loads modification instructions from `prompt_templates/sea_updater_p_v2.txt`
+- Loads modification instructions from `prompt_templates/sea/updater_v2.txt`
 - Sends current prompt + selected suggestions to LLM
 - LLM applies surgical changes (no rewrites)
 - Returns modified prompt text and change summary
@@ -282,16 +282,18 @@ Located in `src/agents/` directory:
 - Other agent implementations would go here
 
 **Prompt Templates:**
-Located in `prompt_templates/` directory:
-- **SEA System Prompts:**
-  - `sea_critic_eval.txt` - Individual evaluation instructions
-  - `sea_critic_p_v2.txt` - Pattern analysis instructions
-  - `sea_updater_p_v2.txt` - Prompt modification instructions
+Located in `prompt_templates/` directory with organized structure:
+- **SEA System Prompts** (`prompt_templates/sea/`):
+  - `critic_eval.txt` - Individual evaluation instructions
+  - `critic_pattern_v2.txt` - Pattern analysis instructions (latest)
+  - `critic_pattern_v1.txt` - Pattern analysis (legacy)
+  - `updater_v2.txt` - Prompt modification instructions (latest)
+  - `updater_v1.txt` - Prompt modification (legacy)
 
-- **Agent Prompts (Being Optimized):**
-  - `math_tools_basic.txt` - Basic math solver prompt
-  - `math_tools.txt` - Advanced math solver prompt
-  - Other agent prompts for different domains
+- **Agent Prompts** (`prompt_templates/agents/{domain}/`):
+  - `math_solver/basic.txt` - Basic math solver prompt
+  - `math_solver/advanced.txt` - Advanced math solver prompt
+  - Other agent domains can be added as subdirectories
 
 **Evaluation Configuration:**
 - `rubric.json` - Located in project root
@@ -307,7 +309,7 @@ The system optimizes a math-solving agent whose core logic lives in:
 - **Tools**: Calculator and other math tools in `sea/tools.py`
 
 **How It Works:**
-1. The agent's system prompt (from `prompt_templates/`) is what evolves
+1. The agent's system prompt (from `prompt_templates/agents/{domain}/`) is what evolves
 2. The agent's code remains unchanged
 3. Only the instructions (prompt) improve through evolution
 4. The solver wrapper passes the evolving prompt to the agent
@@ -322,7 +324,7 @@ The system optimizes a math-solving agent whose core logic lives in:
 - Define domain-specific tool set
 
 **2. Create Initial Agent Prompt:**
-- Add new prompt in `prompt_templates/{domain}_agent.txt`
+- Add new prompt in `prompt_templates/agents/{domain}/basic.txt`
 - This is the prompt that will evolve
 - Start with basic instructions to demonstrate evolution
 
@@ -333,9 +335,9 @@ The system optimizes a math-solving agent whose core logic lives in:
 - Specify expected patterns
 
 **4. Customize SEA Prompts (Optional):**
-- Keep generic `sea_critic_eval.txt` and `sea_critic_p_v2.txt` (they work across domains)
+- Keep generic `sea/critic_eval.txt` and `sea/critic_pattern_v2.txt` (they work across domains)
 - Or create domain-specific versions if needed
-- Update `sea_updater_p_v2.txt` if domain has unique requirements
+- Update `sea/updater_v2.txt` if domain has unique requirements
 
 **5. Create Solver Wrapper:**
 - Implement domain-specific solver function
@@ -347,17 +349,17 @@ The system optimizes a math-solving agent whose core logic lives in:
 python scripts/run_sea_evolution.py \
   --name {domain}_agent \
   --experiment-id exp_001 \
-  --prompt prompt_templates/{domain}_agent.txt \
+  --prompt prompt_templates/agents/{domain}/basic.txt \
   --problems 10 \
   --cycles 3
 ```
 
 **Example - Code Generation Agent:**
 ```
-src/agents/code_gen/          # Agent implementation
-prompt_templates/code_gen.txt # Initial agent prompt
-rubric_code.json              # Code quality criteria
-sea/solver.py                 # Update to support code_gen_solver()
+src/agents/code_gen/                          # Agent implementation
+prompt_templates/agents/code_gen/basic.txt    # Initial agent prompt
+rubric_code.json                              # Code quality criteria
+sea/solver.py                                 # Update to support code_gen_solver()
 ```
 
 The SEA framework (`sea/` components) remains unchanged - it's agent-agnostic.
@@ -434,7 +436,7 @@ python scripts/run_sea_evolution.py [OPTIONS]
 |------|---------|---------|-------|
 | `--name` | Base prompt name for Weave tracking | `math_solver_prompt` | Should describe the agent/domain |
 | `--experiment-id` | Unique experiment identifier | None | Use for parallel experiments |
-| `--prompt` | Path to initial agent prompt file | `prompt_templates/math_tools.txt` | The prompt being evolved |
+| `--prompt` | Path to initial agent prompt file | `prompt_templates/agents/math_solver/advanced.txt` | The prompt being evolved |
 | `--problems` | Number of problems per cycle | 10 | More problems = better pattern detection |
 | `--cycles` | Number of evolution cycles | 3 | Each cycle attempts one improvement |
 | `--threshold` | Score threshold for updates | 0.85 | Update only if score < threshold |
@@ -445,7 +447,7 @@ python scripts/run_sea_evolution.py [OPTIONS]
 ```bash
 python scripts/run_sea_evolution.py \
   --name test_run \
-  --prompt prompt_templates/math_tools_basic.txt \
+  --prompt prompt_templates/agents/math_solver/basic.txt \
   --problems 5 \
   --cycles 1
 ```
@@ -455,7 +457,7 @@ python scripts/run_sea_evolution.py \
 python scripts/run_sea_evolution.py \
   --name math_solver \
   --experiment-id baseline_v1 \
-  --prompt prompt_templates/math_tools_basic.txt \
+  --prompt prompt_templates/agents/math_solver/basic.txt \
   --problems 10 \
   --cycles 5 \
   --threshold 0.85
@@ -704,7 +706,7 @@ All improvements identified and applied through LLM analysis - no manual interve
 3. **Evaluation data malformed** - Missing required fields in evaluations
 
 **Solution:**
-- Verify `prompt_templates/sea_critic_p_v2.txt` exists
+- Verify `prompt_templates/sea/critic_pattern_v2.txt` exists
 - Check LLM response format (should be pure JSON or JSON in markdown code block)
 - Review evaluation structure matches expected format
 - Test with fewer problems first (--problems 3)

@@ -42,7 +42,7 @@ def main(
     problems_per_cycle: int = 10,
     num_cycles: int = 3,
     threshold: float = 0.85,
-    initial_prompt_file: str = "prompt_templates/math_tools.txt",
+    initial_prompt_file: str = "prompt_templates/agents/math_solver/advanced.txt",
     prompt_name: str = "math_solver_prompt",
     experiment_id: str = None
 ):
@@ -197,7 +197,7 @@ if __name__ == "__main__":
     parser.add_argument("--problems", type=int, default=10, help="Problems per cycle")
     parser.add_argument("--cycles", type=int, default=3, help="Number of cycles")
     parser.add_argument("--threshold", type=float, default=0.85, help="Update threshold")
-    parser.add_argument("--prompt", type=str, default="prompt_templates/math_tools.txt",
+    parser.add_argument("--prompt", type=str, default="prompt_templates/agents/math_solver/advanced.txt",
                        help="Initial prompt file")
     parser.add_argument("--name", type=str, default="math_solver_prompt",
                        help="Base name for prompt in Weave")

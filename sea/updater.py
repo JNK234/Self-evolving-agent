@@ -18,7 +18,7 @@ class Updater:
         self.max_suggestions = max_suggestions
 
         # Load pattern-based updater prompt
-        with open("prompt_templates/sea_updater_p_v2.txt", 'r') as f:
+        with open("prompt_templates/sea/updater_v2.txt", 'r') as f:
             self.prompt_template = f.read()
 
     @weave.op()

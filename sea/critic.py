@@ -20,11 +20,11 @@ class Critic:
             self.rubric = json.load(f)
 
         # Load evaluation prompt (for individual solutions)
-        with open("prompt_templates/sea_critic_eval.txt", 'r') as f:
+        with open("prompt_templates/sea/critic_eval.txt", 'r') as f:
             self.eval_prompt = f.read()
 
         # Load pattern analysis prompt (for cycle aggregation)
-        with open("prompt_templates/sea_critic_p_v2.txt", 'r') as f:
+        with open("prompt_templates/sea/critic_pattern_v2.txt", 'r') as f:
             self.cycle_prompt = f.read()
 
     @weave.op()
