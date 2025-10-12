@@ -6,6 +6,10 @@ def extract_answer(text):
     match = re.search(r'####\s*([0-9\.]+)', text)
     return match.group(1) if match else None
 
+def extract_boolean(text):
+    match = re.search(r'####\s*(True|False)', text, re.IGNORECASE)
+    return match.group(1).capitalize() if match else None
+
 def save_eval_results(model_name, total, correct, incorrect, accuracy, responses, run_name=None):
 
     os.makedirs("eval_results", exist_ok=True)

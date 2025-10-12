@@ -1,15 +1,11 @@
-# ABOUTME: Core LLM inference module using LangChain with Google Gemini models
-# ABOUTME: Integrates Weave for automatic tracing and observability of LLM operations
 
 import os
 from typing import Optional, Dict, Any
 from dotenv import load_dotenv
-import weave
 from langchain_core.prompts import PromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, AIMessage
 
-# Load environment variables from .env file
 load_dotenv()
 
 # Initialize Weave for automatic tracing

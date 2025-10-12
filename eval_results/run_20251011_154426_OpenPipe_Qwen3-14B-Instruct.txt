@@ -1,0 +1,61 @@
+GSM8K Evaluation Results
+==================================================
+
+Model: OpenPipe/Qwen3-14B-Instruct
+Run Name: run_20251011_154426
+Total Examples Tested: 100
+Correct: 91
+Incorrect: 9
+Accuracy: 0.9100 (91.00%)
+
+Example Responses:
+------------------------------
+
+Example 1:
+Question: Janet’s ducks lay 16 eggs per day. She eats three for breakfast every morning and bakes muffins for her friends every day with four. She sells the remainder at the farmers' market daily for $2 per fresh duck egg. How much in dollars does she make every day at the farmers' market?
+Expected Answer: Janet sells 16 - 3 - 4 = <<16-3-4=9>>9 duck eggs a day.
+She makes 9 * 2 = $<<9*2=18>>18 every day at the farmer’s market.
+#### 18
+Model Response: Janet’s ducks lay **16 eggs per day**.
+
+She **eats 3 eggs** for breakfast and **uses 4 eggs** to bake muffins.  
+So, the total number of eggs used is:  
+$$ 3 + 4 = 7 $$
+
+The number of eggs remaining to be sold is:  
+$$ 16 - 7 = 9 $$
+
+She sells each egg for **$2**, so the total amount she makes is:  
+$$ 9 \times 2 = 18 $$
+
+#### 18
+Extracted Answer: 18
+Expected Answer: 18
+Correct: Yes
+
+------------------------------
+
+Example 2:
+Question: A robe takes 2 bolts of blue fiber and half that much white fiber.  How many bolts in total does it take?
+Expected Answer: It takes 2/2=<<2/2=1>>1 bolt of white fiber
+So the total amount of fabric is 2+1=<<2+1=3>>3 bolts of fabric
+#### 3
+Model Response: The robe takes 2 bolts of blue fiber. It takes half that much white fiber, which is:
+
+$$
+\frac{1}{2} \times 2 = 1 \text{ bolt of white fiber}
+$$
+
+Adding both together:
+
+$$
+2 + 1 = 3
+$$
+
+#### 3
+Extracted Answer: 3
+Expected Answer: 3
+Correct: Yes
+
+------------------------------
+
