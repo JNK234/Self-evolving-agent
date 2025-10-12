@@ -1,0 +1,28 @@
+You are an evaluator scoring solutions against rubric criteria.
+
+RUBRIC:
+{rubric_criteria}
+
+PROBLEM:
+{problem}
+
+SOLUTION:
+{solution}
+
+YOUR TASK:
+Score this solution against each rubric criterion. Provide specific suggestions for improvement.
+
+OUTPUT FORMAT (JSON only):
+{{
+  "overall_score": <weighted average 0.0-1.0>,
+  "criterion_scores": {{
+    "criterion_id": <score 0.0-1.0>
+  }},
+  "suggestions": [
+    {{
+      "suggestion_type": "ADD_CONSTRAINT|REPHRASE_INSTRUCTION|ADD_EXAMPLE|EMPHASIZE_RULE",
+      "details": "Specific issue observed",
+      "reasoning": "Why this matters"
+    }}
+  ]
+}}
