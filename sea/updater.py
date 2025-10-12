@@ -2,9 +2,9 @@
 # ABOUTME: Uses prompt_templates/sea_updater_p_v2.txt for surgical prompt modifications
 
 import weave
-from typing import List, Dict, Any
-from langchain_google_genai import ChatGoogleGenerativeAI
+from typing import List, Dict, Any, Optional
 from langchain_core.messages import HumanMessage, SystemMessage
+from src.llm.llm_factory import get_llm
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -13,9 +13,23 @@ load_dotenv()
 class Updater:
     """Applies LLM-suggested improvements to agent prompts."""
 
-    def __init__(self, model: str = "gemini-2.0-flash", max_suggestions: int = 3):
-        self.model = model
+    def __init__(
+        self,
+        model: Optional[str] = None,
+        max_suggestions: int = 3,
+        use_config: bool = True
+    ):
+        """
+        Initialize Updater with LLM from config or explicit model.
+
+        Args:
+            model: Optional explicit model name (overrides config)
+            max_suggestions: Maximum suggestions to apply per cycle
+            use_config: Whether to use config.yaml (default: True)
+        """
+        self.model_override = model
         self.max_suggestions = max_suggestions
+        self.use_config = use_config
 
         # Load pattern-based updater prompt
         with open("prompt_templates/sea/updater_v2.txt", 'r') as f:
@@ -67,7 +81,12 @@ class Updater:
         )
 
         # Call LLM to apply changes
-        llm = ChatGoogleGenerativeAI(model=self.model, temperature=0)
+        if self.use_config:
+            llm = get_llm("updater", override_model=self.model_override)
+        else:
+            from langchain_google_genai import ChatGoogleGenerativeAI
+            llm = ChatGoogleGenerativeAI(model=self.model_override or "gemini-2.0-flash", temperature=0)
+
         messages = [
             SystemMessage(content=formatted_prompt),
             HumanMessage(content="Apply the suggestions to the prompt.")

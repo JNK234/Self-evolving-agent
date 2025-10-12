@@ -3,9 +3,9 @@
 
 import json
 import weave
-from typing import Dict, Any, List
-from langchain_google_genai import ChatGoogleGenerativeAI
+from typing import Dict, Any, List, Optional
 from langchain_core.messages import HumanMessage, SystemMessage
+from src.llm.llm_factory import get_llm
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -14,14 +14,16 @@ load_dotenv()
 class PatternRecognizer:
     """Identifies repetitive patterns in agent traces for tool creation opportunities."""
 
-    def __init__(self, model: str = "gemini-2.0-flash"):
+    def __init__(self, model: Optional[str] = None, use_config: bool = True):
         """
         Initialize pattern recognizer.
 
         Args:
-            model: LLM model name for pattern analysis
+            model: Optional explicit model name (overrides config)
+            use_config: Whether to use config.yaml (default: True)
         """
-        self.model = model
+        self.model_override = model
+        self.use_config = use_config
 
         # Load pattern recognition prompt
         with open("prompt_templates/sea/pattern_recognizer.txt", 'r') as f:
@@ -55,7 +57,12 @@ class PatternRecognizer:
         )
 
         # LLM analyzes patterns
-        llm = ChatGoogleGenerativeAI(model=self.model, temperature=0)
+        if self.use_config:
+            llm = get_llm("pattern_recognizer", override_model=self.model_override)
+        else:
+            from langchain_google_genai import ChatGoogleGenerativeAI
+            llm = ChatGoogleGenerativeAI(model=self.model_override or "gemini-2.0-flash", temperature=0)
+
         messages = [
             SystemMessage(content=formatted_prompt),
             HumanMessage(content=f"Analyze these {len(traces)} traces and identify patterns that appear at least {min_frequency} times.")

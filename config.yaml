@@ -1,0 +1,53 @@
+# Configuration for Self-Evolving Agent LLM models
+# Each component can use different providers and models
+
+llm_config:
+  # Solver agent configuration - uses W&B Inference
+  solver:
+    provider: wandb  # Options: google, wandb
+    model_name: microsoft/Phi-4-mini-instruct
+    temperature: 0  # Deterministic for math problems
+
+  # Critic agent configuration - uses Gemini Pro
+  critic:
+    provider: google
+    model_name: gemini-2.5-pro
+    temperature: 0
+
+  # Updater agent configuration - uses Gemini Pro
+  updater:
+    provider: google
+    model_name: gemini-2.5-pro
+    temperature: 0
+
+  # Tool Generator configuration - uses Gemini Pro
+  tool_generator:
+    provider: google
+    model_name: gemini-2.5-pro
+    temperature: 0
+
+  # Pattern Recognizer configuration
+  pattern_recognizer:
+    provider: google
+    model_name: gemini-2.5-pro
+    temperature: 0
+
+  # Tool Ideator configuration
+  tool_ideator:
+    provider: google
+    model_name: gemini-2.5-pro
+    temperature: 0
+
+# Self-improvement trigger configuration
+self_improvement:
+  trigger_every_n_runs: 10  # Run self-improvement after N solver runs
+  critic_tuner:
+    enabled: true
+    score_threshold: 0.85  # Only update if score below threshold
+    max_suggestions: 3  # Maximum suggestions to apply per cycle
+
+  automatic_tool_creation:
+    enabled: true
+    min_pattern_frequency: 3  # Minimum occurrences to trigger tool creation
+    test_in_sandbox: true  # Test tools before integration
+    max_test_attempts: 3  # Max regeneration attempts on test failure

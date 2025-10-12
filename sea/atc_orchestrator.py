@@ -17,24 +17,26 @@ class ATCOrchestrator:
     def __init__(
         self,
         project_name: str,
-        pattern_model: str = "gemini-2.0-flash",
-        ideator_model: str = "gemini-2.0-flash",
-        codegen_model: str = "gemini-2.0-flash"
+        use_config: bool = True,
+        pattern_model: str = None,
+        ideator_model: str = None,
+        codegen_model: str = None
     ):
         """
         Initialize ATC orchestrator.
 
         Args:
             project_name: Weave project name for trace fetching
-            pattern_model: Model for pattern recognition
-            ideator_model: Model for tool ideation
-            codegen_model: Model for code generation
+            use_config: Whether to use config.yaml for model selection (default: True)
+            pattern_model: Optional model override for pattern recognition
+            ideator_model: Optional model override for tool ideation
+            codegen_model: Optional model override for code generation
         """
         self.project_name = project_name
         self.trace_fetcher = WeaveTraceFetcher(project_name)
-        self.pattern_recognizer = PatternRecognizer(model=pattern_model)
-        self.tool_ideator = ToolIdeator(model=ideator_model)
-        self.tool_generator = ToolGenerator(model=codegen_model)
+        self.pattern_recognizer = PatternRecognizer(model=pattern_model, use_config=use_config)
+        self.tool_ideator = ToolIdeator(model=ideator_model, use_config=use_config)
+        self.tool_generator = ToolGenerator(model=codegen_model, use_config=use_config)
         self.daytona_manager = None  # Lazy initialization
 
     @weave.op()
@@ -46,6 +48,8 @@ class ATCOrchestrator:
         generate_specifications: bool = True,
         generate_code: bool = False,
         test_in_sandbox: bool = False,
+        save_to_agent: str = None,
+        max_test_attempts: int = 3,
         op_name_filter: Optional[str] = "run_react_agent"
     ) -> Dict[str, Any]:
         """
@@ -57,7 +61,9 @@ class ATCOrchestrator:
             min_frequency: Minimum pattern occurrences
             generate_specifications: Whether to generate detailed specs
             generate_code: Whether to generate Python code from specs
-            test_in_sandbox: Whether to test generated code in Daytona sandbox
+            test_in_sandbox: If True, tests code in sandbox before saving (strict quality gate)
+            save_to_agent: Agent name to save tools to (e.g., "math_solver")
+            max_test_attempts: Maximum regeneration attempts if sandbox tests fail
             op_name_filter: Filter for specific operation names
 
         Returns:
@@ -151,76 +157,88 @@ class ATCOrchestrator:
                 print(f"❌ {error_msg}")
                 results["errors"].append(error_msg)
 
-        # Step 4: Generate code (optional)
+        # Step 4: Generate code with integrated testing (optional)
         if generate_code and results["tool_specifications"]:
             print(f"\n💻 STEP 4: Generating Python code")
-            try:
-                generated_tools = self.tool_generator.generate_code_batch(
-                    results["tool_specifications"]
-                )
-                results["generated_tools"] = generated_tools
+            if test_in_sandbox:
+                print(f"   🔒 Strict mode: Tools will be tested before saving")
 
-                successful_gen = sum(1 for tool in generated_tools if tool.get("tool_code"))
-                print(f"✓ Generated code for {successful_gen}/{len(generated_tools)} tools")
-
-            except Exception as e:
-                error_msg = f"Code generation failed: {str(e)}"
-                print(f"❌ {error_msg}")
-                results["errors"].append(error_msg)
-
-        # Step 5: Test in sandbox (optional)
-        if test_in_sandbox and results["generated_tools"]:
-            print(f"\n🧪 STEP 5: Testing code in Daytona sandboxes")
-
-            # Lazy initialize DaytonaManager
-            if not self.daytona_manager:
+            # Initialize DaytonaManager if testing enabled
+            if test_in_sandbox and not self.daytona_manager:
                 try:
+                    print(f"   Initializing Daytona sandbox manager...")
                     self.daytona_manager = DaytonaManager()
                 except Exception as e:
                     error_msg = f"Failed to initialize DaytonaManager: {str(e)}"
                     print(f"❌ {error_msg}")
                     results["errors"].append(error_msg)
-                    results["test_results"] = []
+                    # Disable testing if manager fails
+                    test_in_sandbox = False
 
-            if self.daytona_manager:
-                test_results = []
+            try:
+                generated_tools = []
 
-                for tool in results["generated_tools"]:
-                    if not tool.get("tool_code"):
-                        print(f"  ⏭️  Skipping {tool.get('tool_name', 'unknown')} - no code generated")
-                        continue
+                for spec in results["tool_specifications"]:
+                    tool_name = spec.get('name', 'unknown')
+                    print(f"\n  Generating {tool_name}...")
 
                     try:
-                        print(f"  Testing {tool.get('tool_name', 'unknown')}...")
-                        test_result = self.daytona_manager.run_code_with_tests(
-                            tool_code=tool["tool_code"],
-                            dependencies=tool.get("dependencies", ["pytest"])
+                        # Generate code with optional testing
+                        code_result = self.tool_generator.generate_code(
+                            specification=spec,
+                            save_to_agent=save_to_agent,
+                            test_before_save=test_in_sandbox,
+                            daytona_manager=self.daytona_manager if test_in_sandbox else None,
+                            max_test_attempts=max_test_attempts
                         )
 
-                        test_results.append({
-                            "tool_name": tool.get("tool_name", "unknown"),
-                            "success": test_result["success"],
-                            "exit_code": test_result["exit_code"],
-                            "execution_time": test_result["execution_time"],
-                            "output": test_result["output"],
-                            "error": test_result.get("error")
-                        })
+                        generated_tools.append(code_result)
 
-                        status = "✓ PASS" if test_result["success"] else "✗ FAIL"
-                        print(f"    {status} ({test_result['execution_time']:.2f}s)")
+                        # Report status
+                        if code_result.get('save_status') == 'saved':
+                            test_info = ""
+                            if test_in_sandbox and code_result.get('test_attempts'):
+                                attempts = code_result['test_attempts']
+                                test_info = f" (tested, {attempts} attempt{'s' if attempts > 1 else ''})"
+                            print(f"  ✓ {tool_name}: Saved successfully{test_info}")
+                        elif code_result.get('save_status') == 'test_failed':
+                            attempts = code_result.get('test_attempts', 0)
+                            print(f"  ✗ {tool_name}: Tests failed after {attempts} attempts - NOT saved")
+                        elif code_result.get('save_status') == 'validation_failed':
+                            print(f"  ✗ {tool_name}: Validation failed - NOT saved")
+                        elif not code_result.get('tool_code'):
+                            print(f"  ✗ {tool_name}: Code generation failed")
+                        else:
+                            print(f"  ℹ️  {tool_name}: Generated but not saved")
 
                     except Exception as e:
-                        error_msg = f"Testing failed for {tool.get('tool_name', 'unknown')}: {str(e)}"
-                        print(f"    ❌ {error_msg}")
-                        test_results.append({
-                            "tool_name": tool.get("tool_name", "unknown"),
-                            "success": False,
-                            "error": error_msg
+                        error_msg = f"Error generating {tool_name}: {str(e)}"
+                        print(f"  ❌ {error_msg}")
+                        generated_tools.append({
+                            "error": str(e),
+                            "specification": spec,
+                            "tool_name": tool_name,
+                            "tool_code": None
                         })
 
-                results["test_results"] = test_results
-                passed = sum(1 for r in test_results if r["success"])
-                print(f"✓ Testing complete: {passed}/{len(test_results)} passed")
+                results["generated_tools"] = generated_tools
+
+                # Summary statistics
+                total_tools = len(generated_tools)
+                successful_gen = sum(1 for tool in generated_tools if tool.get("tool_code"))
+                saved_tools = sum(1 for tool in generated_tools if tool.get("save_status") == "saved")
+                test_failed = sum(1 for tool in generated_tools if tool.get("save_status") == "test_failed")
+
+                print(f"\n✓ Code generation complete:")
+                print(f"  - Generated: {successful_gen}/{total_tools}")
+                print(f"  - Saved: {saved_tools}/{total_tools}")
+                if test_in_sandbox:
+                    print(f"  - Test failures: {test_failed}/{total_tools}")
+
+            except Exception as e:
+                error_msg = f"Code generation failed: {str(e)}"
+                print(f"❌ {error_msg}")
+                results["errors"].append(error_msg)
 
         # Cycle summary
         cycle_end = datetime.now()
@@ -237,7 +255,16 @@ class ATCOrchestrator:
         print(f"Tool proposals: {len(results['tool_proposals'])}")
         print(f"Specifications: {len(results['tool_specifications'])}")
         print(f"Code generated: {len(results['generated_tools'])}")
-        print(f"Tests passed: {sum(1 for r in results['test_results'] if r['success'])}/{len(results['test_results'])}")
+
+        # Tools saved summary
+        saved_count = sum(1 for t in results['generated_tools'] if t.get('save_status') == 'saved')
+        print(f"Tools saved: {saved_count}/{len(results['generated_tools'])}")
+
+        # Test summary (if testing was enabled)
+        if test_in_sandbox and results['generated_tools']:
+            test_failed_count = sum(1 for t in results['generated_tools'] if t.get('save_status') == 'test_failed')
+            print(f"Test failures: {test_failed_count}/{len(results['generated_tools'])}")
+
         print(f"Errors: {len(results['errors'])}")
         print("="*60 + "\n")
 

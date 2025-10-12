@@ -3,9 +3,9 @@
 
 import json
 import weave
-from typing import Dict, Any, List
-from langchain_google_genai import ChatGoogleGenerativeAI
+from typing import Dict, Any, List, Optional
 from langchain_core.messages import HumanMessage, SystemMessage
+from src.llm.llm_factory import get_llm
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -14,8 +14,23 @@ load_dotenv()
 class Critic:
     """Evaluates agent solutions using LLM-based pattern analysis."""
 
-    def __init__(self, rubric_path: str = "src/agents/math_solver/rubric.json", model: str = "gemini-2.0-flash"):
-        self.model = model
+    def __init__(
+        self,
+        rubric_path: str = "src/agents/math_solver/rubric.json",
+        model: Optional[str] = None,
+        use_config: bool = True
+    ):
+        """
+        Initialize Critic with LLM from config or explicit model.
+
+        Args:
+            rubric_path: Path to rubric JSON file
+            model: Optional explicit model name (overrides config)
+            use_config: Whether to use config.yaml (default: True)
+        """
+        self.use_config = use_config
+        self.model_override = model
+
         with open(rubric_path, 'r') as f:
             self.rubric = json.load(f)
 
@@ -66,7 +81,12 @@ class Critic:
         )
 
         # LLM does pattern analysis
-        llm = ChatGoogleGenerativeAI(model=self.model, temperature=0)
+        if self.use_config:
+            llm = get_llm("critic", override_model=self.model_override)
+        else:
+            from langchain_google_genai import ChatGoogleGenerativeAI
+            llm = ChatGoogleGenerativeAI(model=self.model_override or "gemini-2.0-flash", temperature=0)
+
         messages = [
             SystemMessage(content=formatted_prompt),
             HumanMessage(content="Analyze the evaluation results and identify patterns.")
@@ -137,7 +157,12 @@ class Critic:
             solution=solution
         )
 
-        llm = ChatGoogleGenerativeAI(model=self.model, temperature=0)
+        if self.use_config:
+            llm = get_llm("critic", override_model=self.model_override)
+        else:
+            from langchain_google_genai import ChatGoogleGenerativeAI
+            llm = ChatGoogleGenerativeAI(model=self.model_override or "gemini-2.0-flash", temperature=0)
+
         messages = [
             SystemMessage(content=formatted_prompt),
             HumanMessage(content=f"Problem: {problem}\n\nSolution:\n{solution}")
