@@ -52,7 +52,6 @@ def main():
     try:
         results = orchestrator.run_atc_cycle(
             num_traces=10,
-            agent_domain="math",
             min_frequency=2,
             generate_specifications=True,
             op_name_filter="run_react_agent"

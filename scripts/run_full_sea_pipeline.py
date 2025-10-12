@@ -172,9 +172,8 @@ def main(
                 problems=cycle_problems,
                 solver_func=solve_with_wb_inference,
                 current_prompt_obj=current_prompt_obj,
-                num_recent_traces=20,
+                num_recent_traces=10,
                 op_name_filter="run_react_agent",
-                agent_domain="math",
                 save_tools_to_agent=agent_name
             )
 

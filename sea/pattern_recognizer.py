@@ -33,7 +33,6 @@ class PatternRecognizer:
     def identify_patterns(
         self,
         traces: List[Dict[str, Any]],
-        agent_domain: str = "general",
         min_frequency: int = 3
     ) -> Dict[str, Any]:
         """
@@ -41,7 +40,6 @@ class PatternRecognizer:
 
         Args:
             traces: List of agent execution traces
-            agent_domain: Optional domain context (e.g., "math", "code", "data")
             min_frequency: Minimum occurrences for pattern detection
 
         Returns:
@@ -52,8 +50,7 @@ class PatternRecognizer:
 
         # Create prompt with traces data
         formatted_prompt = self.recognition_prompt.format(
-            traces_summary=traces_summary,
-            agent_domain=agent_domain
+            traces_summary=traces_summary
         )
 
         # LLM analyzes patterns

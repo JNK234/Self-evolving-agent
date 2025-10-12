@@ -157,12 +157,6 @@ def main():
         help="Weave project name (defaults to WEAVE_PROJECT_NAME env var)"
     )
     parser.add_argument(
-        "--agent-domain",
-        type=str,
-        default="general",
-        help="Agent domain for context: math, code, data, general (default: general)"
-    )
-    parser.add_argument(
         "--output-file",
         type=str,
         default="atc_results/tool_proposals.json",
@@ -259,7 +253,6 @@ def main():
     # Run ATC cycle
     results = orchestrator.run_atc_cycle(
         num_traces=args.traces,
-        agent_domain=args.agent_domain,
         min_frequency=args.min_frequency,
         generate_specifications=args.generate_specs,
         generate_code=args.generate_code,
@@ -325,7 +318,7 @@ def main():
     print(f"✓ Code generated: {len(results.get('generated_tools', []))}")
     print(f"✓ Tests passed: {sum(1 for r in results.get('test_results', []) if r['success'])}/{len(results.get('test_results', []))}")
     print(f"✓ Results saved to: {args.output_file}")
-    print(f"✓ Check Weave UI for detailed traces!")
+    print("✓ Check Weave UI for detailed traces!")
     print(f"{'='*60}\n")
 
 

@@ -25,9 +25,6 @@ PATTERN TYPES TO DETECT:
 TRACES ANALYZED:
 {traces_summary}
 
-CURRENT AGENT DOMAIN: {agent_domain}
-(This helps context but your analysis should be domain-neutral)
-
 OUTPUT FORMAT (JSON only):
 {{
   "patterns_identified": [

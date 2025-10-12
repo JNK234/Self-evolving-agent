@@ -108,28 +108,34 @@ def <tool_name>(<parameters_with_types>) -> <return_type>:
 
 
 # TEST CASES
-import pytest
+try:
+    # Tests require pytest
+    import pytest
 
 
-def test_<test_case_1_name>():
-    '''<test_description_from_spec>'''
-    # Test the implementation function directly
-    result = <tool_name>_impl(<test_inputs>)
-    assert result == <expected_output>
+    def test_<test_case_1_name>():
+        '''<test_description_from_spec>'''
+        # Test the implementation function directly
+        result = <tool_name>_impl(<test_inputs>)
+        assert result == <expected_output>
 
 
-def test_<test_case_2_name>():
-    '''<test_description_from_spec>'''
-    # Test the implementation function directly
-    result = <tool_name>_impl(<test_inputs>)
-    assert result == <expected_output>
+    def test_<test_case_2_name>():
+        '''<test_description_from_spec>'''
+        # Test the implementation function directly
+        result = <tool_name>_impl(<test_inputs>)
+        assert result == <expected_output>
 
 
-def test_edge_case_<edge_case_name>():
-    '''Test edge case: <description>'''
-    # Test edge case handling as specified
-    with pytest.raises(<ErrorType>):
-        <tool_name>_impl(<invalid_input>)
+    def test_edge_case_<edge_case_name>():
+        '''Test edge case: <description>'''
+        # Test edge case handling as specified
+        with pytest.raises(<ErrorType>):
+            <tool_name>_impl(<invalid_input>)
+
+except ImportError:
+    # pytest not available, skip tests
+    pass
 ```
 
 VALIDATION CHECKLIST:

@@ -42,9 +42,8 @@ class UnifiedOrchestrator:
         problems: List[Dict[str, Any]],
         solver_func,
         current_prompt_obj: weave.StringPrompt,
-        num_recent_traces: int = 20,
-        op_name_filter: str = "run_react_agent",
-        agent_domain: str = "math",
+        num_recent_traces: int = 10,
+        op_name_filter: str = None,
         save_tools_to_agent: str = None
     ) -> Dict[str, Any]:
         """
@@ -54,9 +53,8 @@ class UnifiedOrchestrator:
             problems: List of problems for Critic-Tuner evaluation
             solver_func: Solver function for Critic-Tuner
             current_prompt_obj: Current solver prompt (weave.StringPrompt)
-            num_recent_traces: Number of traces for ATC pattern analysis
+            num_recent_traces: Number of recent traces for ATC (default: 10)
             op_name_filter: Filter for trace retrieval
-            agent_domain: Domain for pattern recognition
             save_tools_to_agent: Agent name to save generated tools to
 
         Returns:
@@ -120,7 +118,6 @@ class UnifiedOrchestrator:
             try:
                 atc_results = self.atc.run_atc_cycle(
                     num_traces=num_recent_traces,
-                    agent_domain=agent_domain,
                     min_frequency=self.min_pattern_frequency,
                     generate_specifications=True,
                     generate_code=True,

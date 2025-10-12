@@ -40,7 +40,7 @@ llm_config:
 
 # Self-improvement trigger configuration
 self_improvement:
-  trigger_every_n_runs: 10  # Run self-improvement after N solver runs
+  trigger_every_n_runs: 5  # Run self-improvement after N solver runs
   critic_tuner:
     enabled: true
     score_threshold: 0.85  # Only update if score below threshold

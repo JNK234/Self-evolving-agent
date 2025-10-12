@@ -42,23 +42,21 @@ class ATCOrchestrator:
     @weave.op()
     def run_atc_cycle(
         self,
-        num_traces: int = 20,
-        agent_domain: str = "math",
+        num_traces: int = 10,
         min_frequency: int = 3,
         generate_specifications: bool = True,
         generate_code: bool = False,
         test_in_sandbox: bool = False,
         save_to_agent: str = None,
         max_test_attempts: int = 3,
-        op_name_filter: Optional[str] = "run_react_agent"
+        op_name_filter: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Run complete ATC cycle: traces → patterns → specifications → code → testing.
 
         Args:
-            num_traces: Number of traces to analyze
-            agent_domain: Domain context for pattern recognition
-            min_frequency: Minimum pattern occurrences
+            num_traces: Number of traces to analyze (default: 10)
+            min_frequency: Minimum pattern occurrences (default: 3)
             generate_specifications: Whether to generate detailed specs
             generate_code: Whether to generate Python code from specs
             test_in_sandbox: If True, tests code in sandbox before saving (strict quality gate)
@@ -79,7 +77,6 @@ class ATCOrchestrator:
                 "start_time": cycle_start.isoformat(),
                 "project_name": self.project_name,
                 "num_traces_requested": num_traces,
-                "agent_domain": agent_domain,
                 "min_frequency": min_frequency
             },
             "patterns_identified": [],
@@ -118,7 +115,6 @@ class ATCOrchestrator:
         try:
             pattern_analysis = self.pattern_recognizer.identify_patterns(
                 traces=traces,
-                agent_domain=agent_domain,
                 min_frequency=min_frequency
             )
 

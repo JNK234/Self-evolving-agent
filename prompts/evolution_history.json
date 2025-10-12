@@ -1,35 +1,52 @@
 [
   {
     "cycle": 1,
-    "avg_score": 0.59,
-    "criterion_scores": {
-      "clarity_of_reasoning": 0.5,
-      "correct_tool_usage": 0.08,
-      "final_answer_format": 0.97
-    },
-    "updated": true,
-    "version": 1
+    "problems_processed": 20,
+    "avg_score": 0.8195,
+    "prompt_updated": true,
+    "prompt_version": 1,
+    "tools_created": 2,
+    "total_tools": 2,
+    "summary": "Prompt: updated (score: 0.820) | Tools: 2 created/saved"
   },
   {
     "cycle": 2,
-    "avg_score": 0.69,
-    "criterion_scores": {
-      "clarity_of_reasoning": 0.75,
-      "correct_tool_usage": 0.17,
-      "final_answer_format": 0.9
-    },
-    "updated": true,
-    "version": 2
+    "problems_processed": 40,
+    "avg_score": null,
+    "prompt_updated": false,
+    "prompt_version": 1,
+    "tools_created": 0,
+    "total_tools": 2,
+    "summary": "Evaluation only (no self-improvement)"
   },
   {
     "cycle": 3,
-    "avg_score": 0.417,
-    "criterion_scores": {
-      "clarity_of_reasoning": 0.33,
-      "correct_tool_usage": 0.08,
-      "final_answer_format": 0.68
-    },
-    "updated": true,
-    "version": 3
+    "problems_processed": 60,
+    "avg_score": 0.907,
+    "prompt_updated": false,
+    "prompt_version": 1,
+    "tools_created": 2,
+    "total_tools": 4,
+    "summary": "Prompt: unchanged (score: 0.907) | Tools: 2 created/saved"
+  },
+  {
+    "cycle": 4,
+    "problems_processed": 80,
+    "avg_score": null,
+    "prompt_updated": false,
+    "prompt_version": 1,
+    "tools_created": 0,
+    "total_tools": 4,
+    "summary": "Evaluation only (no self-improvement)"
+  },
+  {
+    "cycle": 5,
+    "problems_processed": 100,
+    "avg_score": null,
+    "prompt_updated": false,
+    "prompt_version": 1,
+    "tools_created": 0,
+    "total_tools": 4,
+    "summary": "Evaluation only (no self-improvement)"
   }
 ]
