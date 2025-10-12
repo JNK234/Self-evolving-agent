@@ -1,0 +1,221 @@
+GSM8K Evaluation Results
+==================================================
+
+Model: SEA_Agent
+Run Name: SEA_Agent_20251012_100622
+Total Examples Tested: 20
+Correct: 16
+Incorrect: 4
+Accuracy: 0.8000 (80.00%)
+
+Example Responses:
+------------------------------
+
+Example 1:
+Question: Natalia sold clips to 48 of her friends in April, and then she sold half as many clips in May. How many clips did Natalia sell altogether in April and May?
+Expected Answer: Natalia sold 48/2 = <<48/2=24>>24 clips in May.
+Natalia sold 48+24 = <<48+24=72>>72 clips altogether in April and May.
+#### 72
+Model Response: You are a helpful AI agent specialized in solving mathematical word problems.
+
+TASK: Solve the given mathematical problem step by step using the available tools.
+
+INSTRUCTIONS:
+1. Read the problem carefully and identify what needs to be calculated
+2. Break down the problem into smaller, manageable steps
+3. For EACH calculation, you MUST use a tool - NEVER do mental math
+4. Show your work clearly with step-by-step reasoning
+5. Use the appropriate tool for each operation (add, subtract, multiply, divide, power, sqrt)
+6. At the end, provide the final numerical answer in this exact format: #### [number]
+
+Remember: Always end with #### [your final answer]
+Natalia sold clips to 48 of her friends in April, and then she sold half as many clips in May. How many clips did Natalia sell altogether in April and May?
+, May, and June?
+
+
+To determine the total number of clips Natalia sold in April, May, and June, we first need to calculate the number of clips she sold in May.
+
+function calls: []
+result: []
+
+{
+  "type": "function",
+  "function": {
+      "name": "divide",
+      "description": "Divide a by b. Returns an integer result.",
+      "parameters": {
+          "a": 48,
+          "b": 2
+      },
+      "required": [
+          "a",
+          "b"
+      ],
+      "type": "object"
+  }
+}
+Extracted Answer: You are a helpful AI agent specialized in solving mathematical word problems.
+
+TASK: Solve the given mathematical problem step by step using the available tools.
+
+INSTRUCTIONS:
+1. Read the problem carefully and identify what needs to be calculated
+2. Break down the problem into smaller, manageable steps
+3. For EACH calculation, you MUST use a tool - NEVER do mental math
+4. Show your work clearly with step-by-step reasoning
+5. Use the appropriate tool for each operation (add, subtract, multiply, divide, power, sqrt)
+6. At the end, provide the final numerical answer in this exact format: #### [number]
+
+Remember: Always end with #### [your final answer]
+Natalia sold clips to 48 of her friends in April, and then she sold half as many clips in May. How many clips did Natalia sell altogether in April and May?
+, May, and June?
+
+
+To determine the total number of clips Natalia sold in April, May, and June, we first need to calculate the number of clips she sold in May.
+
+function calls: []
+result: []
+
+{
+  "type": "function",
+  "function": {
+      "name": "divide",
+      "description": "Divide a by b. Returns an integer result.",
+      "parameters": {
+          "a": 48,
+          "b": 2
+      },
+      "required": [
+          "a",
+          "b"
+      ],
+      "type": "object"
+  }
+}
+Expected Answer: Natalia sold 48/2 = <<48/2=24>>24 clips in May.
+Natalia sold 48+24 = <<48+24=72>>72 clips altogether in April and May.
+#### 72
+Correct: No
+
+------------------------------
+
+Example 2:
+Question: Weng earns $12 an hour for babysitting. Yesterday, she just did 50 minutes of babysitting. How much did she earn?
+Expected Answer: Weng earns 12/60 = $<<12/60=0.2>>0.2 per minute.
+Working 50 minutes, she earned 0.2 x 50 = $<<0.2*50=10>>10.
+#### 10
+Model Response: You are a helpful AI agent specialized in solving mathematical word problems.
+
+TASK: Solve the given mathematical problem step by step using the available tools.
+
+INSTRUCTIONS:
+1. Read the problem carefully and identify what needs to be calculated
+2. Break down the problem into smaller, manageable steps
+3. For EACH calculation, you MUST use a tool - NEVER do mental math
+4. Show your work clearly with step-by-step reasoning
+5. Use the appropriate tool for each operation (add, subtract, multiply, divide, power, sqrt)
+6. At the end, provide the final numerical answer in this exact format: #### [number]
+
+Remember: Always end with #### [your final answer]
+Weng earns $12 an hour for babysitting. Yesterday, she just did 50 minutes of babysitting. How much did she earn?
+
+Tool being called: multiply(a=0.8333, b=12)
+Tool being called: subtract(from=50, to=60)
+9.999600000000001
+9.999600000000001
+Error: 2 validation errors for subtract
+a
+  Field required [type=missing, input_value={'from': 50, 'to': 60}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+b
+  Field required [type=missing, input_value={'from': 50, 'to': 60}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+ Please fix your mistakes.
+Error: 2 validation errors for subtract
+a
+  Field required [type=missing, input_value={'from': 50, 'to': 60}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+b
+  Field required [type=missing, input_value={'from': 50, 'to': 60}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+ Please fix your mistakes.
+To calculate Weng's earnings, we first need to convert the babysitting time from minutes to hours, and then multiply it by her hourly rate. Since you attempted to use a subtract function, which is not calculated in the response, let's avoid that and just calculate the first part (converting minutes to hours).
+
+First, we convert 50 minutes to hours:
+
+50 / 60 = 0.8333 hours
+
+Now, we multiply the hours worked by the hourly rate to find the earnings:
+
+0.8333 hours * $12/hour = $10.00
+
+Weng earned $10.00 for 50 minutes of babysitting.
+
+Now, let's format the function call correctly to get just the multiplication (conversion and calculation) part:
+
+```
+[
+    {"name": "multiply", "arguments": {"a": 50/60, "b": 12}}
+]
+```
+Extracted Answer: You are a helpful AI agent specialized in solving mathematical word problems.
+
+TASK: Solve the given mathematical problem step by step using the available tools.
+
+INSTRUCTIONS:
+1. Read the problem carefully and identify what needs to be calculated
+2. Break down the problem into smaller, manageable steps
+3. For EACH calculation, you MUST use a tool - NEVER do mental math
+4. Show your work clearly with step-by-step reasoning
+5. Use the appropriate tool for each operation (add, subtract, multiply, divide, power, sqrt)
+6. At the end, provide the final numerical answer in this exact format: #### [number]
+
+Remember: Always end with #### [your final answer]
+Weng earns $12 an hour for babysitting. Yesterday, she just did 50 minutes of babysitting. How much did she earn?
+
+Tool being called: multiply(a=0.8333, b=12)
+Tool being called: subtract(from=50, to=60)
+9.999600000000001
+9.999600000000001
+Error: 2 validation errors for subtract
+a
+  Field required [type=missing, input_value={'from': 50, 'to': 60}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+b
+  Field required [type=missing, input_value={'from': 50, 'to': 60}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+ Please fix your mistakes.
+Error: 2 validation errors for subtract
+a
+  Field required [type=missing, input_value={'from': 50, 'to': 60}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+b
+  Field required [type=missing, input_value={'from': 50, 'to': 60}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+ Please fix your mistakes.
+To calculate Weng's earnings, we first need to convert the babysitting time from minutes to hours, and then multiply it by her hourly rate. Since you attempted to use a subtract function, which is not calculated in the response, let's avoid that and just calculate the first part (converting minutes to hours).
+
+First, we convert 50 minutes to hours:
+
+50 / 60 = 0.8333 hours
+
+Now, we multiply the hours worked by the hourly rate to find the earnings:
+
+0.8333 hours * $12/hour = $10.00
+
+Weng earned $10.00 for 50 minutes of babysitting.
+
+Now, let's format the function call correctly to get just the multiplication (conversion and calculation) part:
+
+```
+[
+    {"name": "multiply", "arguments": {"a": 50/60, "b": 12}}
+]
+```
+Expected Answer: Weng earns 12/60 = $<<12/60=0.2>>0.2 per minute.
+Working 50 minutes, she earned 0.2 x 50 = $<<0.2*50=10>>10.
+#### 10
+Correct: Yes
+
+------------------------------
+

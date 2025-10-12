@@ -199,7 +199,9 @@ def run_sea_agent(total_problems: int = 100, update_frequency: int = 5) -> Dict[
     print(f"Prompt updated {len(prompt_versions)-1} times")
     
     return results
-def test_final_solver(test_problems: int = 10, prompt_file: str = None) -> None:
+
+@weave.op()
+def test_final_solver(test_problems: int = 10, prompt_file: str = None) -> Dict[str, Any]:
     """
     Test the final evolved solver on new problems
     """
@@ -211,7 +213,7 @@ def test_final_solver(test_problems: int = 10, prompt_file: str = None) -> None:
         prompt_files = glob.glob("prompt_templates/sea_solver_evolved_*.txt")
         if not prompt_files:
             print("No evolved prompt files found. Please run run_sea_agent() first.")
-            return
+            return None
         
         # Get the most recent file
         prompt_file = max(prompt_files, key=os.path.getctime)
@@ -223,13 +225,15 @@ def test_final_solver(test_problems: int = 10, prompt_file: str = None) -> None:
             final_prompt = f.read()
     except FileNotFoundError:
         print(f"Prompt file not found: {prompt_file}")
-        return
+        return None
 
     # Load test dataset
     ds = load_dataset("openai/gsm8k", "main")
     dataset = ds['test'][100:100+test_problems]
     
     correct = 0
+    test_responses = []
+    
     for i, (query, answer) in enumerate(zip(dataset['question'], dataset['answer'])):
         print(f"\nTest Problem {i+1}:")
         response, _ = solve_problem(query, final_prompt)
@@ -238,22 +242,67 @@ def test_final_solver(test_problems: int = 10, prompt_file: str = None) -> None:
         eval_result = evaluate_with_llm(query, answer, response)
         is_correct = eval_result.get("correct", False)
         
+        # Store test results
+        test_responses.append({
+            "problem_id": i + 1,
+            "question": query,
+            "expected_answer": answer,
+            "predicted_answer": response,
+            "response": response,
+            "is_correct": is_correct,
+            "prompt_file": prompt_file
+        })
+        
         if is_correct:
             correct += 1
             print("CORRECT")
         else:
             print("INCORRECT")
-            # Fixed: was 'expected' and 'predicted' - these variables don't exist
             expected = extract_answer(answer)
             predicted = extract_answer(response)
             print(f"Expected: {expected}, Got: {predicted}")
     
     test_accuracy = correct / test_problems
-    print(f"\nTest accuracy: {test_accuracy:.3f} ({correct}/{test_problems})")
-
+    
+    # Log test results to wandb
+    test_run_name = f"SEA_Agent_Test_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    log_to_wandb(
+        "SEA_Agent_Test", 
+        test_problems, 
+        correct, 
+        test_accuracy, 
+        test_responses, 
+        test_run_name, 
+        "SEA_Agent_Test"
+    )
+    
+    # Save test results
+    save_eval_results("SEA_Agent_Test", test_problems, correct, 
+                     test_problems - correct, test_accuracy, test_responses, test_run_name)
+    
+    print(f"\n🎯 Test Results:")
+    print(f"Test accuracy: {test_accuracy:.3f} ({correct}/{test_problems})")
+    print(f"Used prompt: {prompt_file}")
+    print(f"Results logged to Weights & Biases: {test_run_name}")
+    
+    return {
+        "test_problems": test_problems,
+        "correct": correct,
+        "incorrect": test_problems - correct,
+        "test_accuracy": test_accuracy,
+        "test_responses": test_responses,
+        "prompt_file": prompt_file,
+        "run_name": test_run_name
+    }
 if __name__ == "__main__":
     # Run the SEA agent system
-    results = run_sea_agent(total_problems=20, update_frequency=10)
+    results = run_sea_agent(total_problems=30, update_frequency=10)
     
     # Test the final solver
-    # test_final_solver(test_problems=10)
+    test_results = test_final_solver(test_problems=30)
+
+    if test_results:
+        print(f"\nSummary:")
+        print(f"Training accuracy: {results['final_accuracy']:.3f}")
+        print(f"Test accuracy: {test_results['test_accuracy']:.3f}")
+        print(f"Improvement: {test_results['test_accuracy'] - results['final_accuracy']:.3f}")

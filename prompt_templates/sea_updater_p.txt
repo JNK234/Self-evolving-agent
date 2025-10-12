@@ -12,4 +12,4 @@ Response: {response}
 Critic: {critic}
 Initial Prompt: {initial_prompt}
 
-Output only the UDPATED version of the prompt:
+Output the updated prompt:
