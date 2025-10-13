@@ -1,0 +1,25 @@
+{
+  "name": "GSM8K Math Problem Solving Rubric",
+  "version": "1.0",
+  "description": "Evaluation criteria for mathematical problem-solving with calculator tool usage",
+  "criteria": [
+    {
+      "id": "clarity_of_reasoning",
+      "description": "The reasoning steps are clear, logical, and easy to follow with explicit intermediate thoughts",
+      "weight": 0.2,
+      "expected_pattern": "Step-by-step breakdown showing work, intermediate calculations visible"
+    },
+    {
+      "id": "correct_tool_usage",
+      "description": "The calculator tool is used appropriately for ALL arithmetic operations, no mental math",
+      "weight": 0.6,
+      "expected_pattern": "Tool calls present for calculations with correct arguments, no manual computation"
+    },
+    {
+      "id": "final_answer_format",
+      "description": "The final answer is explicitly stated in the required format and easy to identify",
+      "weight": 0.2,
+      "expected_pattern": "Answer ends with: #### <numeric_value>"
+    }
+  ]
+}

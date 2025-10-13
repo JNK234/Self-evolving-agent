@@ -1,0 +1,203 @@
+[36m[1mweave[0m: Logged in as Weights & Biases user: jnk789.
+[36m[1mweave[0m: View Weave data at https://wandb.ai/vishnu-narasimha/sea-project/weave
+======================================================================
+FULL SEA PIPELINE - Unified Self-Improvement System
+======================================================================
+
+Configuration:
+  Solver: wandb - coreweave/cw_OpenPipe_Qwen3-14B-Instruct
+  Critic: google - gemini-2.0-flash-exp
+  Updater: google - gemini-2.0-flash-exp
+  Tool Generator: google - gemini-2.0-flash-exp
+  Self-Improvement Trigger: Every 3 problems
+  Critic-Tuner: Enabled
+  ATC: Enabled
+
+[36m[1mweave[0m: Logged in as Weights & Biases user: jnk789.
+[36m[1mweave[0m: View Weave data at https://wandb.ai/vishnu-narasimha/sea-project/weave
+[36m[1mweave[0m: 📦 Published to https://wandb.ai/vishnu-narasimha/sea-project/weave/objects/math_solver_prompt_phase4_test/versions/ZSuOxsQEm5RKtYTNRbZm97FYUlGb0FPdYp5FYLzLXsA
+
+✓ Weave initialized: vishnu-narasimha/sea-project
+✓ Initial prompt published to Weave as 'math_solver_prompt_phase4_test:v0'
+
+[36m[1mweave[0m: Logged in as Weights & Biases user: jnk789.
+[36m[1mweave[0m: View Weave data at https://wandb.ai/vishnu-narasimha/sea-project/weave
+[36m[1mweave[0m: 🍩 https://wandb.ai/vishnu-narasimha/sea-project/r/call/0199d991-b463-74c3-b318-7c8ccbb2271b
+✓ WeaveTraceFetcher initialized for vishnu-narasimha/sea-project
+✓ Unified orchestrator initialized
+✓ Loaded 7470 GSM8K problems
+
+
+======================================================================
+EVOLUTION CYCLE 1/1
+======================================================================
+Processing problems 1-3...
+
+🔄 Self-improvement triggered (processed 3 problems)
+
+======================================================================
+UNIFIED SELF-IMPROVEMENT CYCLE
+======================================================================
+
+📊 STAGE 1: Critic-Tuner Cycle
+----------------------------------------------------------------------
+
+❌ Critic-Tuner cycle failed: Error code: 404 - {'code': '', 'type': 'invalid_request_error', 'message': 'The requested resource was not found.'}
+
+
+🔧 STAGE 2: Automatic Tool Creation
+----------------------------------------------------------------------
+
+============================================================
+ATC CYCLE STARTED
+============================================================
+
+📊 STEP 1: Fetching traces from Weave
+📊 Fetching traces from vishnu-narasimha/sea-project...
+   Filters: op_name=run_react_agent, roots_only=True, limit=20
+✓ Retrieved 83 calls from Weave
+✓ Filtered to 20 calls matching 'run_react_agent'
+✓ Formatted 20 valid traces
+✓ Successfully fetched 20 traces
+
+🔍 STEP 2: Analyzing patterns
+✓ Pattern analysis complete
+  - Patterns identified: 4
+  - Tool proposals: 1
+
+🛠️  STEP 3: Generating tool specifications
+✓ Generated 4 specifications
+
+💻 STEP 4: Generating Python code
+   🔒 Strict mode: Tools will be tested before saving
+   Initializing Daytona sandbox manager...
+
+  Generating calculate_percentage...
+
+============================================================
+Generation Attempt 1/3
+============================================================
+Error parsing JSON response: Invalid \escape: line 2 column 1714 (char 1715)
+Response text: {
+  "tool_code": "'''\nTool: calculate_percentage\nDescription: Calculates the percentage of a given value.\nCategory: computation\n'''\n\n# Standard library imports\n\n\n# Type hints (only for comple...
+  ❌ Error generating calculate_percentage: Invalid \escape: line 2 column 1714 (char 1715)
+
+  Generating calculate_total_cost...
+
+============================================================
+Generation Attempt 1/3
+============================================================
+
+🧪 Testing generated code in Daytona sandbox...
+Creating Daytona sandbox...
+  Sandbox created: 7fc80bad-1369-45ee-8468-bd2be9d968f0
+  Installing dependencies: pytest, langchain_core
+  Writing code to generated_tool.py...
+  Running tests...
+  Test execution completed: ✗ FAIL
+  Pytest exit code: 1
+  Execution time: 2.99s
+  Cleaning up sandbox...
+  Sandbox removed
+✗ Tests FAILED on attempt 1
+   Exit code: 1
+   Retrying with error feedback...
+
+============================================================
+Generation Attempt 2/3
+============================================================
+
+🧪 Testing generated code in Daytona sandbox...
+Creating Daytona sandbox...
+  Sandbox created: f4a365be-1885-4f21-adb4-44c7602a14b7
+  Installing dependencies: pytest
+  Writing code to generated_tool.py...
+  Running tests...
+  Test execution completed: ✓ PASS
+  Pytest exit code: 0
+  Execution time: 2.82s
+  Cleaning up sandbox...
+  Sandbox removed
+✓ Tests PASSED on attempt 2
+✓ Saved calculate_total_cost to src/agents/math_solver/tools/generated/calculate_total_cost.py
+  ✓ calculate_total_cost: Saved successfully (tested, 2 attempts)
+
+  Generating calculate_difference...
+
+============================================================
+Generation Attempt 1/3
+============================================================
+
+🧪 Testing generated code in Daytona sandbox...
+Creating Daytona sandbox...
+  Sandbox created: bc90843c-d2bb-4a3a-bbf7-6508cdf1f33a
+  Installing dependencies: pytest, langchain_core
+  Writing code to generated_tool.py...
+  Running tests...
+  Test execution completed: ✓ PASS
+  Pytest exit code: 0
+  Execution time: 2.92s
+  Cleaning up sandbox...
+  Sandbox removed
+✓ Tests PASSED on attempt 1
+✓ Saved calculate_difference to src/agents/math_solver/tools/generated/calculate_difference.py
+  ✓ calculate_difference: Saved successfully (tested, 1 attempt)
+
+  Generating calculate_product...
+
+============================================================
+Generation Attempt 1/3
+============================================================
+
+🧪 Testing generated code in Daytona sandbox...
+Creating Daytona sandbox...
+  Sandbox created: 371df114-860b-4e72-95b5-ecc9c0e38f68
+  Installing dependencies: pytest
+  Writing code to generated_tool.py...
+  Running tests...
+  Test execution completed: ✓ PASS
+  Pytest exit code: 0
+  Execution time: 2.72s
+  Cleaning up sandbox...
+  Sandbox removed
+✓ Tests PASSED on attempt 1
+✓ Saved calculate_product to src/agents/math_solver/tools/generated/calculate_product.py
+  ✓ calculate_product: Saved successfully (tested, 1 attempt)
+
+✓ Code generation complete:
+  - Generated: 3/4
+  - Saved: 3/4
+  - Test failures: 0/4
+
+============================================================
+ATC CYCLE COMPLETE
+============================================================
+Duration: 89.17s
+Traces analyzed: 20
+Patterns found: 4
+Tool proposals: 1
+Specifications: 4
+Code generated: 4
+Tools saved: 3/4
+Test failures: 0/4
+Errors: 0
+============================================================
+
+
+✓ Tools created and saved: calculate_total_cost, calculate_difference, calculate_product
+   Note: Consider updating prompt to include tool usage instructions
+
+======================================================================
+CYCLE COMPLETE
+======================================================================
+Summary: Tools: 3 created/saved
+======================================================================
+
+✓ New tools: calculate_total_cost, calculate_difference, calculate_product
+Traceback (most recent call last):
+  File "/Users/jnk789/Developer/Self-evolving-agent/scripts/run_full_sea_pipeline.py", line 279, in <module>
+    main(
+  File "/Users/jnk789/Developer/Self-evolving-agent/scripts/run_full_sea_pipeline.py", line 212, in main
+    'avg_score': ct_results.get('avg_score', None),
+                 ^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'

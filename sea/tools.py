@@ -1,41 +1,6 @@
-from langchain.tools import tool
+# ABOUTME: SEA tool imports - single source from src.agents.tools
+# ABOUTME: SEA components use shared calculator instead of individual math ops
 
-# Define arithmetic tools
-@tool
-def add(a: float, b: float) -> float:
-    """Add two numbers together."""
-    return a + b
+from src.agents.tools.langchain_calculator import calculator_tool
 
-
-@tool
-def subtract(a: float, b: float) -> float:
-    """Subtract b from a."""
-    return a - b
-
-
-@tool
-def multiply(a: float, b: float) -> float:
-    """Multiply two numbers."""
-    return a * b
-
-
-@tool
-def divide(a: float, b: float) -> float:
-    """Divide a by b. Returns a float result."""
-    if b == 0:
-        return float('nan')
-    return a / b
-
-
-@tool
-def power(base: float, exponent: float) -> float:
-    """Raise base to the power of exponent."""
-    return base ** exponent
-
-
-@tool
-def sqrt(x: float) -> float:
-    """Calculate the square root of a number."""
-    if x < 0:
-        return float('nan')
-    return x ** 0.5
+__all__ = ["calculator_tool"]

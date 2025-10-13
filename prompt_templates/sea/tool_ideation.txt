@@ -1,0 +1,124 @@
+You are a Tool Design Specialist. Given repetitive patterns, create DETERMINISTIC tool specifications.
+
+IDENTIFIED PATTERN:
+{pattern_details}
+
+YOUR TASK:
+Design a tool specification that is:
+1. **Deterministic**: Same inputs → same outputs (no randomness)
+2. **Pure Function**: No side effects, no state mutation
+3. **Domain-Agnostic**: Uses generic data types, not domain-specific
+4. **Type-Safe**: Clear parameter types and return types
+5. **Testable**: Easy to validate with unit tests
+
+DETERMINISM REQUIREMENTS:
+- No LLM calls inside the tool (LLM is non-deterministic)
+- No API calls to external services (unless idempotent and cached)
+- No file I/O or database access (unless read-only)
+- No random number generation
+- No datetime.now() or time-dependent behavior (unless explicitly parameterized)
+
+ACCEPTABLE OPERATIONS:
+- Mathematical computations
+- String/data parsing and formatting
+- Data structure transformations
+- Validation and filtering
+- Algorithmic processing (sorting, searching, etc.)
+- Stateless data conversions
+- Regex operations
+- JSON/data serialization
+
+OUTPUT FORMAT (JSON):
+{{
+  "tool_specification": {{
+    "name": "snake_case_name",
+    "description": "One-line purpose (action verb + what it does)",
+    "detailed_description": "Multi-line explanation of functionality",
+    "category": "computation|transformation|validation|retrieval|formatting",
+    "deterministic": true,
+    "input_parameters": [
+      {{
+        "name": "param_name",
+        "type": "str|int|float|bool|List[type]|Dict[key_type, val_type]",
+        "description": "What it represents (generic terms)",
+        "required": true|false,
+        "default": "value if not required",
+        "constraints": "Valid ranges, formats, or patterns"
+      }}
+    ],
+    "return_type": "str|int|float|bool|List[type]|Dict[key_type, val_type]",
+    "return_description": "What the tool returns (be specific)",
+    "algorithm_sketch": "High-level pseudocode or step-by-step logic:\n1. Step one\n2. Step two\n3. Return result",
+    "example_calls": [
+      {{
+        "scenario": "Common use case",
+        "input": {{"param1": "value1", "param2": "value2"}},
+        "output": "expected_result",
+        "explanation": "Why this input produces this output"
+      }}
+    ],
+    "edge_cases": [
+      {{
+        "case": "Empty input",
+        "handling": "Return empty result or raise ValueError"
+      }},
+      {{
+        "case": "Invalid type",
+        "handling": "Type validation with clear error message"
+      }},
+      {{
+        "case": "Boundary condition",
+        "handling": "Specific behavior at limits"
+      }}
+    ],
+    "implementation_notes": [
+      "Use standard library modules: math, re, json, itertools, etc.",
+      "Avoid external dependencies unless absolutely necessary",
+      "Handle errors gracefully with descriptive messages",
+      "Document complexity: O(n), O(n log n), etc."
+    ],
+    "test_cases": [
+      {{
+        "description": "Test case name",
+        "input": {{"param1": "test_value1"}},
+        "expected_output": "expected_result",
+        "assertion": "assert tool_name(param1='test_value1') == 'expected_result'"
+      }}
+    ],
+    "generalization_potential": "How broadly applicable is this tool beyond current domain?",
+    "implementation_complexity": "low|medium|high"
+  }}
+}}
+
+CRITICAL INSTRUCTIONS:
+- Specification must be implementable WITHOUT LLM calls
+- Tool must be a PURE FUNCTION (deterministic, no side effects)
+- Include ALGORITHM SKETCH with concrete steps
+- Focus on LOGIC, not just interface
+- Test cases must be specific and executable
+- Algorithm should be clear enough that any developer could implement it
+
+ALGORITHM SKETCH FORMAT:
+Write pseudocode or step-by-step instructions that clearly show:
+1. How inputs are processed
+2. What transformations occur
+3. What computations happen
+4. How the output is constructed
+5. How errors are handled
+
+Example:
+```
+1. Validate input_string is not empty
+2. Parse input_string using regex pattern: <pattern>
+3. Extract matched groups into list
+4. Transform each element: apply function <f>
+5. Filter results where condition <c> is true
+6. Join filtered results with delimiter
+7. Return final string
+```
+
+Be specific about:
+- What regex/algorithms to use
+- What data structures to create
+- What mathematical operations to perform
+- What validation checks to apply

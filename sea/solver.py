@@ -4,18 +4,18 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.tools import tool
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage, ToolMessage
 from langgraph.prebuilt import create_react_agent
-from .tools import add, subtract, multiply, divide, power, sqrt
+from src.agents.shared.tool_loader import load_agent_tools
 from dotenv import load_dotenv
 
 load_dotenv()
 
 def solver(query: str, custom_prompt: str = None):
-    tools = [add, subtract, multiply, divide, power, sqrt]
-    
+    tools = load_agent_tools("math_solver", include_generated=True)
+
     if custom_prompt:
         system_prompt = custom_prompt
     else:
-        with open("prompt_templates/sea_solver_p.txt", "r") as f:
+        with open("prompt_templates/agents/math_solver/solver.txt", "r") as f:
             system_prompt = f.read()
 
     # llm = ChatGoogleGenerativeAI(
