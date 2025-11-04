@@ -1,29 +1,20 @@
 # Self-Evolving Agent
 
-LLM inference with Google Gemini and Weave tracing.
+Built a Self-Improving Agent (SEA) framework during Weights & Biases' WeaveHacks 2 (32-hour hackathon).  
 
-## Setup
+SEA enhances itself through:  
+1. Automatic prompt optimization  
+2. Automatic tool creation  
 
-1. Install dependencies:
-```bash
-uv sync
-```
+Architecture:  
+- **Evolve phase:** While solving tasks, auxiliary agents monitor traces and update system prompts and tools (passive learning; model parameters remain unchanged).  
+- **Inference phase:** The evolved prompt and toolset are applied to new, unseen data.  
 
-2. Configure environment:
-```bash
-cp .env.example .env
-# Add your GOOGLE_API_KEY to .env
-```
+Tested SEA on the MATH 500 dataset using the Phi-4-3.8B model across four settings:  
+1. Phi-4 baseline  
+2. Phi-4 + basic tools  
+3. SEA (evolve phase)  
+4. SEA (inference phase)  
 
-3. Run demo:
-```bash
-PYTHONPATH=. python demos/basic_inference.py
-```
+Results: SEA outperformed the first two baselines by over 13% in both evolve and inference phases.
 
-## Usage
-
-```python
-from src.llm import run_inference
-
-response = run_inference("Your prompt here")
-```
