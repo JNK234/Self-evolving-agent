@@ -1,6 +1,6 @@
 # Self-Evolving Agent
 
-Built a Self-Improving Agent (SEA) framework during Weights & Biases' WeaveHacks 2 (32-hour hackathon).  
+Built a Self-Improving Agent (SEA) framework during Weights & Biases' WeaveHacks 2 (24-hour hackathon).  
 
 SEA enhances itself through:  
 1. Automatic prompt optimization  
