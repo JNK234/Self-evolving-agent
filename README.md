@@ -21,13 +21,25 @@ Built a Self-Improving Agent (SEA) framework during Weights & Biases' WeaveHacks
 ```
 SEA Framework
 ├── Critic System          # Pattern recognition and failure analysis
+│   ├── Analyzes incorrect outputs
+│   ├── Identifies recurring patterns
+│   └── Provides feedback for improvement
 ├── Updater System         # Prompt evolution and refinement
+│   ├── Refines system prompts
+│   ├── Incorporates critic feedback
+│   └── Optimizes prompt effectiveness
 ├── ATC Engine             # Automatic Tool Creation
-│   ├── Tool Ideator
-│   ├── Tool Generator
-│   └── Tool Validator
+│   ├── Tool Ideator       # Identifies tool opportunities
+│   ├── Tool Generator     # Creates LangChain tools
+│   └── Tool Validator     # Tests and validates tools
 ├── Unified Orchestrator   # Coordinates all systems
+│   ├── Manages training loop
+│   ├── Integrates ATC when enabled
+│   └── Handles tool loading
 └── Weave Tracing          # Full observability with W&B
+    ├── Tracks performance metrics
+    ├── Monitors prompt evolution
+    └── Logs tool creation events
 ```
 
 ## How SEA Works
@@ -41,12 +53,21 @@ The evolved prompt and toolset are applied to new, unseen data.
 ## Evaluation Results
 
 Tested SEA on the MATH 500 dataset using the Phi-4-3.8B model across four settings:
-1. Phi-4 baseline
-2. Phi-4 + basic tools
-3. SEA (evolve phase)
-4. SEA (inference phase)
+1. **Phi-4 baseline** - Base model performance
+2. **Phi-4 + basic tools** - Model with calculator and format tools
+3. **SEA (evolve phase)** - Performance after prompt evolution
+4. **SEA (inference phase)** - Performance on unseen data with evolved prompts
 
-Results: SEA outperformed the first two baselines by over 13% in both evolve and inference phases.
+**Results:** SEA outperformed the first two baselines by over 13% in both evolve and inference phases.
+
+### Performance Metrics
+
+- **Baseline Phi-4**: Starting accuracy on MATH 500
+- **Phi-4 + Tools**: Improved accuracy with basic calculator/formatting tools
+- **SEA Evolve Phase**: **+13% improvement** over baseline through prompt optimization
+- **SEA Inference Phase**: Maintains **+13% improvement** on unseen test data
+
+The SEA framework demonstrates consistent performance improvements through automated prompt evolution and tool creation, with the evolve phase showing strong learning capabilities and the inference phase validating generalization to new problems.
 
 ## Setup
 
