@@ -18,6 +18,8 @@ Built a Self-Improving Agent (SEA) framework during Weights & Biases' WeaveHacks
 
 ## Architecture
 
+![SEA Architecture](images/G33af28WAAAjERI.jpeg)
+
 ```
 SEA Framework
 ├── Critic System          # Pattern recognition and failure analysis
@@ -51,6 +53,8 @@ While solving tasks, auxiliary agents monitor traces and update system prompts a
 The evolved prompt and toolset are applied to new, unseen data.
 
 ## Evaluation Results
+
+![MATH 500 Evaluation Results](images/G33aUmHXUAAeL6a.png)
 
 Tested SEA on the MATH 500 dataset using the Phi-4-3.8B model across four settings:
 1. **Phi-4 baseline** - Base model performance
